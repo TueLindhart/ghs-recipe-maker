@@ -17,7 +17,7 @@ def get_en_co2_sql_chain():
     en_co2_sql_chain = SQLDatabaseChain(
         llm=llm,
         database=sql_dk_co2_db,
-        verbose=True,
+        verbose=False,
         prompt=prompt,
         top_k=50,
     )

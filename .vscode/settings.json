@@ -1,5 +1,6 @@
 {
     "python.envFile": "${workspaceFolder}/.env",
+    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
     "python.linting.enabled": true,
     "python.formatting.provider": "black",
     "python.formatting.blackArgs": [

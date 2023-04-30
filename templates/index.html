@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recipe CO2 Emission Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      async function calculateCO2() {
+        const urlInput = document.getElementById('urlInput');
+        const resultDiv = document.getElementById('resultDiv');
+        const url = urlInput.value;
+
+        // Make request to API
+        const response = await fetch(`/calculate?url=${url}`);
+        const result = await response.text();
+
+        // Display result
+        resultDiv.innerHTML = `CO2 Emission: ${result} kg`;
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-6 offset-md-3">
+          <h1 class="text-center mb-4">Recipe CO2 Emission Calculator</h1>
+          <form>
+            <div class="form-group">
+              <label for="urlInput">Enter recipe URL:</label>
+              <input type="text" class="form-control" id="urlInput" name="urlInput">
+            </div>
+            <button type="button" class="btn btn-primary btn-block" onclick="calculateCO2()">Calculate CO2 Emission</button>
+          </form>
+          <div id="resultDiv" class="mt-4"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

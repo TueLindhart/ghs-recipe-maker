@@ -9,11 +9,13 @@ The following recalculations can be used to estimate the weight of each ingredie
 1 small onion = 115 g
 1 pepper = 150 g
 1 tin of tomato concentrate = 140 g
-1 tbsp. = 15 g
-1 tsp. = 5 g
+1 tablespoon/tbsp. = 15 g
+1 teaspoon/tsp. = 5 g
 1 potato = 170 - 300 g
 1 carrot = 100 g
 1 lemon = 60 g
+
+Ingredients that weight less than 10 g or 0.01 kg should be called negligible.
 
 Use the following format:
 Ingredients: "Ingredients here"
@@ -29,6 +31,7 @@ Ingredients:
 500 ml of water
 250 gram of minced meat
 0.5 cauliflower
+1 teaspoon of sugar
 1 organic lemon
 salt
 pepper

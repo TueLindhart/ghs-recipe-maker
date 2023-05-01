@@ -15,7 +15,7 @@ The following recalculations can be used to estimate the weight of each ingredie
 1 carrot = 100 g
 1 lemon = 60 g
 
-Ingredients that weight less than 10 g or 0.01 kg should be called negligible.
+Ingredients that weight less than 10 gram/g or 0.01 kilogram/kg should be called negligible.
 
 Use the following format:
 Ingredients: "Ingredients here"
@@ -26,26 +26,27 @@ Begin!
 Ingredients:
 1 can of chopped tomatoes
 2 large potatoes
-3 teaspoons of sugar
+1 teaspoon of sugar
 200 g of pasta
 500 ml of water
 250 gram of minced meat
 0.5 cauliflower
-1 teaspoon of sugar
+1 teaspoon/tsp. sugar
 1 organic lemon
-salt
+3 teaspoons of salt
 pepper
 
 Answer:
 1 can of chopped tomatoes: 0.4 kg
 2 large potatoes: 0.6 kg
-3 teaspoons of sugar: 0.15 kg
+3 teaspoons of sugar: negligible
 200 g of pasta: 0.2 kg
 500 ml of water: 0.5 kg
 250 gram of minced meat: 0.25 kg
 0.5 cauliflower: 0.250 kg (estimated by LLM model)
+sugar: negligible
 1 organic lemon: 0.06 kg
-salt: negligible
+salt: 0.015 kg
 pepper: negligible
 
 

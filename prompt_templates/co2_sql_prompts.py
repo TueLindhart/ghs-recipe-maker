@@ -100,14 +100,14 @@ Ingredients:
 1. spsk. chilipulver
 1 stjernefrugt
 
-SQLQuery: SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
-          Name LIKE '%tomat%' OR
-          Name LIKE '%linse%' OR
-          Name LIKE '%bouillon%' OR
-          Name LIKE '%saft%' OR
-          Name LIKE '%citron%' OR
-          Name LIKE '%chili%' OR
-          Name LIKE '%stjernefrugt%'
+SQLQuery: SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
+          Navn LIKE '%tomat%' OR
+          Navn LIKE '%linse%' OR
+          Navn LIKE '%bouillon%' OR
+          Navn LIKE '%saft%' OR
+          Navn LIKE '%citron%' OR
+          Navn LIKE '%chili%' OR
+          Navn LIKE '%stjernefrugt%'
 
 SQLResult: [('Tomat, uspec., rå', 0.7), ('Grønne linser, tørrede', 1.78)
             ('Tomatjuice, konserves', 1.26), ('Tomat, flået, konserves', 1.26)

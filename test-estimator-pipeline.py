@@ -29,4 +29,4 @@ def estimator(url: str, verbose: bool = False):
 
 if __name__ == "__main__":
     url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
-    print(estimator(url))
+    print(estimator(url, verbose=True))

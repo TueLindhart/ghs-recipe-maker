@@ -25,7 +25,7 @@ def get_en_co2_sql_chain(language: Literal["da", "en"], verbose: bool = False):
         db=sql_dk_co2_db,
         verbose=verbose,
         prompt=prompt,
-        top_k=50,
+        top_k=100,
     )
 
     return en_co2_sql_chain

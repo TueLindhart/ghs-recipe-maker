@@ -35,8 +35,9 @@ def get_agent(language: Literal["da", "en"], verbose: bool = False):
         Tool(
             name="Google search",
             func=search_chain.run,
-            description="""Useful for finding out the kg CO2e / kg for a single ingredient is not in the database.
-                            Should only use if the ingredient weights more than 10 g.""",
+            description="""Useful for finding out the kg CO2e / kg for an ingredient is not in the database. 
+                            Should only use if the ingredient weights more than 0.05 kg. 
+                            The google search item should only be used for one ingredient at a time.""",
         ),
         Tool(
             name="Math calculator",

@@ -4,6 +4,7 @@ from langchain import GoogleSearchAPIWrapper, LLMChain, LLMMathChain  # , OpenAI
 from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 
+# from agent.search_agent import get_co2_google_search_agent
 from chains.co2_sql import get_en_co2_sql_chain
 from chains.weight_est import get_en_weight_est
 from prompt_templates.main_agent import (
@@ -16,6 +17,7 @@ from prompt_templates.main_agent import (
 
 def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False):
     search_chain = GoogleSearchAPIWrapper(k=10, search_engine="google")
+    # search_agent = get_co2_google_search_agent(language=language, verbose=verbose)
     math_chain = LLMMathChain.from_llm(llm=ChatOpenAI(temperature=0))  # type: ignore
     sql_chain = get_en_co2_sql_chain(language=language, verbose=verbose)
     weight_est_chain = get_en_weight_est(language=language, verbose=verbose)
@@ -32,11 +34,15 @@ def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False
             description="""Useful for finding out the CO2 emission of each item by passing
                            all ingredients at once as input.""",
         ),
+        # Tool(
+        #     name="Search tool",
+        #     func=search_agent.run,
+        # ),
         Tool(
             name="Search tool",
             func=search_chain.run,
-            description="""Useful for finding out the kg CO2e / kg for an ingredient is not in the database. 
-                            Should only use if the ingredient weights more than 0.05 kg. 
+            description="""Useful for finding out the kg CO2e / kg for an ingredient is not in the database.
+                            Should only use if the ingredient weights more than 0.05 kg.
                             The google search item should only be used for one ingredient at a time.""",
         ),
         Tool(

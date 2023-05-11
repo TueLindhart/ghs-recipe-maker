@@ -1,6 +1,6 @@
 from langdetect import detect
 
-from agent import get_agent
+from agent import get_co2_estimator_agent
 from chains.recipe_extractor import get_recipe_extractor_chain
 from utils import get_url_text
 
@@ -21,7 +21,7 @@ def estimator(url: str, verbose: bool = False):
         return "I can't find a recipe in the provided URL"
 
     # Get agent and use it to estimate CO2 emission
-    agent_executor = get_agent(language=language, verbose=verbose)
+    agent_executor = get_co2_estimator_agent(language=language, verbose=verbose)
     co2_estimate = agent_executor.run(ingredients)
 
     return co2_estimate

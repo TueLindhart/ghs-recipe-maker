@@ -98,6 +98,7 @@ Ingredients:
 1 dåse tomatkoncentrat (140 g)
 1 spsk. citronsaft
 1. spsk. chilipulver
+10 majstortillas
 1 stjernefrugt
 
 SQLQuery: SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
@@ -107,6 +108,7 @@ SQLQuery: SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
           Navn LIKE '%saft%' OR
           Navn LIKE '%citron%' OR
           Navn LIKE '%chili%' OR
+          Navn LIKE '%tortilla%' OR
           Navn LIKE '%stjernefrugt%'
 
 SQLResult: [('Tomat, uspec., rå', 0.7), ('Grønne linser, tørrede', 1.78)
@@ -115,7 +117,7 @@ SQLResult: [('Tomat, uspec., rå', 0.7), ('Grønne linser, tørrede', 1.78)
             ('Ispind, limonade', 1.15), ('Citron, rå', 0.94
             ('Æblejuice', 1.64),('Bouillon, hønsekød, spiseklar', 0.38)
             ('Bouillon, oksekød, spiseklar', 0.52), ('Peber, chili, rå', 1.02)
-            ('Peber, chili, konserves', 1.54),
+            ('Tortillabrød, hvede',0.74), ('Peber, chili, konserves', 1.54),
             ]
 
 Answer:
@@ -124,6 +126,7 @@ Hakkede tomater: 1.26 kg CO2e / kg
 Grøntsagsbouillon: 0.38 kg CO2e / kg (closest was chicken bouillon)
 Tomatkoncentrat: 2.48 kg CO2e / kg (closest was tomato paste)
 Citronsaft: 0.94 kg CO2e / kg (Closest was Lemon, raw)
+Majstortillas: 0.74 kg CO2e / kg (Closest was Tortillabrød, hvede)
 Stjernefrugt: ? (Not found in database)
 
 Ingredients: {input}"""
@@ -157,6 +160,7 @@ Ingredients:
 1 tin of tomato concentrate (140 g)
 1 tbsp. lemon juice
 1. tbsp. chili powder
+10 corn tortillas
 1 starfruit
 
 SQLQuery: SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
@@ -166,6 +170,7 @@ SQLQuery: SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
           Name LIKE '%juice%' OR
           Name LIKE '%lemon%' OR
           Name LIKE '%chili%' OR
+          Name LIKE '%tortilla%' OR
           Name LIKE '%starfruit%'
 
 SQLResult: [('Tomato, ripe, raw, origin unknown', 0.7), ('Green lentils, dried', 1.78)
@@ -174,7 +179,7 @@ SQLResult: [('Tomato, ripe, raw, origin unknown', 0.7), ('Green lentils, dried',
             ('Ice, popsickle, lemonade', 1.15), ('Lemon, raw', 0.94
             ('Apple juice', 1.64),('Bouillon, chicken, prepared', 0.38)
             ('Bouillon, beef, prepared', 0.52), ('Pepper, hot chili, raw', 1.02)
-            ('Pepper, hot chili, canned', 1.54),
+            ('Tortilla bread, wheat',0.74),('Pepper, hot chili, canned', 1.54),
             ]
 
 Answer:
@@ -183,6 +188,7 @@ Chopped tomatoes: 1.26 kg CO2e / kg
 Vegetable bouillon: 0.38 kg CO2e / kg (closest was chicken bouillon)
 Tomato concentrate (140 g): 2.48 kg CO2e / kg (closest was tomato paste)
 Lemon juice: 0.94 kg CO2e / kg (Closest was Lemon, raw)
+Corn tortillas: 0.74 kg CO2e / kg (Closest was Tortilla bread, wheat)
 Starfruit: ? (Not found in database)
 
 Ingredients: {input}"""

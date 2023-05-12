@@ -12,9 +12,9 @@ You can use all tools as many times as you want.
 You solve this task by:
 1. Estimating the weights of the ingredients in the recipe using the weight estimation tool. This steps also defines what ingredients are neglible.
 2. Finding the CO2 emission of each ingredient in kg CO2e per kg using the CO2 emission estimator tool. Remember querying all ingredients that are not neglible.
-3. If necessary, use Google Search to get the kg CO2e per kg of a ingredient if the ingredient is not found in step 2.
-   Only search for an ingredient if it is not is neglible and weights more than 0.1 kg. You can only search for one ingredient at a time.
-   You can do this step maximum 2 times. If an ingredient is not found, then inform in the final answer that the ingredient is not found.
+3. If necessary, use Search tool to get the kg CO2e per kg of ingredients if the CO2e of ingredients is not found in step 2.
+   Each ingredient needs to be comma separated when given as input to the search tool. Only search for ingredients that are not neglible and weights more than 0.1 kg. 
+   If an ingredient is not found, then inform in the final answer that the ingredient is not found.
 4. Calculate the CO2 emission in kg per ingredient and sum them to get the total CO2 emission of the recipe using the math calculator tool.
    Only provide input to math tool where both weight and CO2e per kg is known.
 5. Provide the answer where you show the CO2 calculation for each ingredient and the total CO2 emission of the recipe.
@@ -51,9 +51,9 @@ You can use all tools as many times as you want.
 You solve this task by:
 1. Estimating the weights of the ingredients in the recipe using the weight estimation tool. This steps also defines what ingredients are neglible (negligerbar).
 2. Finding the CO2 emission of each ingredient in kg CO2e per kg using the CO2 emission estimator tool. Remember querying all ingredients that are not neglible.
-3. If necessary, use Google Search to get the kg CO2e per kg of a ingredient if the ingredient is not found in step 2.
-   Only search for an ingredient if it is not is neglible and weights more than 0.1 kg. You can only search for one ingredient at a time.
-   You can do this step maximum 2 times. Don't search for the same ingredient twice.
+3. If necessary, use Search tool to get the kg CO2e per kg of ingredients if the CO2e of ingredients is not found in step 2.
+   Each ingredient needs to be comma separated when given as input to the search tool. Only search for ingredients that are not neglible and weights more than 0.1 kg. 
+   If an ingredient is not found, then inform in the final answer that the ingredient is not found.
 4. Calculate the CO2 emission in kg per ingredient and sum them to get the total CO2 emission of the recipe using the math calculator tool.
    Only provide input to math tool where both weight and CO2e per kg is known.
 5. Provide the answer where you show the CO2 calculation for each ingredient and the total CO2 emission of the recipe.

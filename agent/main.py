@@ -1,3 +1,4 @@
+from types import coroutine
 from typing import Literal
 
 from langchain import (
@@ -11,7 +12,7 @@ from langchain.chat_models import ChatOpenAI
 
 # from agent.search_agent import get_co2_google_search_agent
 from agent.search_agent import get_co2_google_search_agent
-from chains.async_search import get_async_agent
+from chains.co2_search import get_async_search_agent_tool, get_search_agent_tool
 from chains.co2_sql import get_en_co2_sql_chain
 from chains.weight_est import get_en_weight_est
 from prompt_templates.main_agent import (
@@ -28,7 +29,7 @@ def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False
     weight_est_chain = get_en_weight_est(language=language, verbose=verbose)
     # search_chain = GoogleSerperAPIWrapper(k=10, gl="dk")
 
-    search_tool = get_async_agent(search_agent=get_co2_google_search_agent(verbose=verbose))
+    search_tool = get_search_agent_tool(search_agent=get_co2_google_search_agent(verbose=verbose))
 
     tools = [
         Tool(
@@ -52,8 +53,9 @@ def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False
         #     name="Search tool",
         #     func=search_chain.run,
         #     description="""Useful for finding out the kg CO2e / kg for an ingredient is not in the database.
-        #                     Should only use if the ingredient weights more than 0.05 kg.
-        #                     The google search item should only be used for one ingredient at a time.""",
+        #                     Should only use if the ingredient weights more than 0.1 kg.
+        #                     The search item should only be used for one ingredient at a time.""",
+        #     coroutine=search_chain.arun,
         # ),
         search_tool,
         Tool(

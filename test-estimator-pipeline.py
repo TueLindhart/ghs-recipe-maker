@@ -50,8 +50,8 @@ async def async_estimator(url: str, verbose: bool = False):
 
 
 if __name__ == "__main__":
-    import asyncio
+    # import asyncio
 
     url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
 
-    asyncio.run(async_estimator(url, verbose=True))
+    print(estimator(url, verbose=True))

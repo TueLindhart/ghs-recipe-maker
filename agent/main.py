@@ -1,9 +1,6 @@
-from types import coroutine
 from typing import Literal
 
-from langchain import (
-    GoogleSearchAPIWrapper,
-    GoogleSerperAPIWrapper,
+from langchain import (  # GoogleSearchAPIWrapper,; GoogleSerperAPIWrapper,
     LLMChain,
     LLMMathChain,
 )
@@ -12,7 +9,7 @@ from langchain.chat_models import ChatOpenAI
 
 # from agent.search_agent import get_co2_google_search_agent
 from agent.search_agent import get_co2_google_search_agent
-from chains.co2_search import get_async_search_agent_tool, get_search_agent_tool
+from chains.co2_search import get_search_agent_tool
 from chains.co2_sql import get_en_co2_sql_chain
 from chains.weight_est import get_en_weight_est
 from prompt_templates.main_agent import (

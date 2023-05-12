@@ -1,12 +1,13 @@
+import asyncio
 import re
 
 import requests
 from bs4 import BeautifulSoup
+from langchain.agents import AgentExecutor
+from langchain.tools import tool
 
 
-def get_url_text(
-    url: str, text_length: int = 1000
-):  # Expand text length when it needs to estmate CO2 of cooking methods
+def get_url_text(url: str, text_length: int = 1000):  # Expand text length when it needs to estmate CO2 of cooking methods
     html = requests.get(url).text
     soup = BeautifulSoup(html, features="html.parser")
 
@@ -40,6 +41,10 @@ def get_url_text(
 
     results = re.findall(r"(ingredi.*\S)", text)
     return " ".join([result[:text_length] for result in results])
+
+
+async def async_search_item(search_agent: AgentExecutor, input: str):
+    return await search_agent.arun(input)
 
 
 if __name__ == "__main__":

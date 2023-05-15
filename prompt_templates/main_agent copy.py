@@ -16,20 +16,12 @@ Step 1. Estimating the weights of the ingredients in the recipe using the weight
 Step 2. Finding the CO2 emission of each ingredient in kg CO2e per kg using the CO2 emission estimator tool. Remember querying all ingredients that are not neglible.
 Step 3. Step 3 is optional. Only use Search tool to get the kg CO2e per kg of ingredients if the kg CO2e per kg is not found in step 2 for an ingredient.
         Remember to only search for ingredients that are not neglible. Each ingredient needs to be comma separated when given as input to the search tool.
-Step 4. Calculate the CO2 emission in kg per ingredient by parsing 'print(x1 * y1, x2 * y2, ...)' to the python calculator tool
-        which will give you the outputs 'z1 z2 z3 ...'. x = kg CO2e per kg and y = weight and z = emission in kg CO2.
-        Only provide input to python calculator tool where both weight is not negligeble (negligerbar) and CO2e per kg is known.
-Step 5. Given the output from step 4, you then calculate the total CO2 emission of the recipe by parsing 'print(x1*y1 + x2*y2 + ...)' to the python calculator tool.
-Step 6. Provide the final answer when you show the kg CO2 emission for each ingredient and the total CO2 emission of the recipe.
+Step 4. Calculate the CO2 emission in kg per ingredient and sum them to get the total CO2 emission of the recipe using the math calculator tool.
+        Only provide input to math tool where both weight and CO2e per kg is known.
+Step 5. Provide the answer where you show the CO2 calculation for each ingredient and the total CO2 emission of the recipe.
 
-You can only use the search tool (step 3) if the two conditions are met:
-- Condition 1: ingredient is NOT neglible (negligerbar) in step 1
-- Condition 2: CO2e per kg is not found in step 2.
-During 'Thought', you need to think about the two conditions and if they are met, you can use the search tool.
 
-In the Question section, the ingredients are provided.
-
-In step 6, when you know the CO2e emission per kilo of each ingredient and the total CO2e emission in kg,
+When you know the CO2e emission per kilo of each ingredient and the total CO2e emission in kg,
 use this template for the Final Answer;
 '''
 Total CO2 emission: Z Total kg CO2e
@@ -41,6 +33,10 @@ etc.
 
 where 'ingredient N' is the name of the ingredient, 'X' is the CO2e per kg of the ingredient, 'Y' is the weight of the ingredient and 'Z' is the CO2 emission of the ingredient.
 Formatting of the final answer is not an Action but the output in the 'Final Answer'.
+
+In the Question section, the ingredients are provided.
+
+Remember, it is only possible to use the search tool if kg CO2e / kg is not available for an ingredient in step 2 and the ingredient is not neglible in step 1.
 
 Begin!
 
@@ -62,22 +58,17 @@ You can use all tools as many times as you want.
 You solve this task by:
 Step 1. Estimating the weights of the ingredients in the recipe using the weight estimation tool. This steps also defines what ingredients are neglible (negligerbar).
 Step 2. Finding the CO2 emission of each ingredient in kg CO2e per kg using the CO2 emission estimator tool. Remember querying all ingredients that are not neglible (negligerbar).
-Step 3. Step 3 is optional. Only use Search tool to get the kg CO2e per kg of ingredients if the kg CO2e per kg is NOT found in step 2 for an ingredient and the ingredient is not neglible. 
-        Each ingredient needs to be comma separated when given as input to the search tool.
-Step 4. Calculate the CO2 emission in kg per ingredient by parsing 'print(x1 * y1, x2 * y2, ...)' to the python calculator tool
-        which will give you the outputs 'z1 z2 z3 ...'. x = kg CO2e per kg and y = weight and z = emission in kg CO2.
-        Only provide input to python calculator tool where both weight is not negligeble (negligerbar) and CO2e per kg is known.
-Step 5. Given the output from step 4, you then calculate the total CO2 emission of the recipe by parsing 'print(x1*y1 + x2*y2 + ...)' to the python calculator tool.
-Step 6. Provide the final answer when you show the kg CO2 emission for each ingredient and the total CO2 emission of the recipe.
+Step 3. Step 3 is optional. Only use Search tool to get the kg CO2e per kg of ingredients if the kg CO2e per kg is not found in step 2 for an ingredient.
+        Remember to only search for ingredients that are not neglible. Each ingredient needs to be comma separated when given as input to the search tool.
+Step 4. Calculate the CO2 emission in kg per ingredient and sum them to get the total CO2 emission of the recipe using the math calculator tool.
+        Only provide input to math tool where both weight and CO2e per kg is known.
+Step 5. Provide the answer where you show the CO2 calculation for each ingredient and the total CO2 emission of the recipe.
 
-You can only use the search tool (step 3) if the two conditions are met:
-- Condition 1: ingredient is NOT neglible (negligerbar) in step 1
-- Condition 2: CO2e per kg is not found in step 2.
-During 'Thought', you need to think about the two conditions and if they are met, you can use the search tool.
+Remember, you only use the search tool if ingredient is NOT neglible (negligerbar) and CO2e per kg is not found.
 
 In the Question section, the ingredients are provided.
 
-In step 6, when you know the CO2e emission per kilo of each ingredient and the total CO2e emission in kg,
+When you know the CO2e emission per kilo of each ingredient and the total CO2e emission in kg,
 use this template for the Final Answer;
 
 '''
@@ -93,6 +84,8 @@ etc.
 
 where 'ingredient N' is the name of the ingredient, 'X' is the CO2e per kg of the ingredient, 'Y' is the weight of the ingredient and 'Z' is the CO2 emission of the ingredient.
 Formatting of the final answer is not an Action but the output in the 'Final Answer'.
+
+Remember, it is only possible to use the search tool if kg CO2e / kg is not available for an ingredient in step 2 and the ingredient is not neglible (negligerbar) in step 1.
 
 Begin!
 

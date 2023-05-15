@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     start_time = time()
     url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
-    print(estimator(url, verbose=True))
+    print(estimator(url, verbose=False))
     end_time = time()
 
     print(f"Time elapsed: {end_time - start_time}s")

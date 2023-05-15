@@ -14,6 +14,8 @@ Solve the task using the following steps:
   Example Answer: 'Chopped tomatoes: X kg CO2e/ kg \n'.
 - If the ingredient is not found in the database, return '?'.
   Example Answer: 'Chopped tomatoes: ? \n'
+- Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer. 
+  Instead, return the closest match. 
 
 Use the following format:
 Ingredients: "Ingredients here"
@@ -23,6 +25,8 @@ Answer: "Final answer here"
 
 Only use the following tables:
 {table_info}
+
+
 
 Begin!
 
@@ -79,6 +83,8 @@ Solve the task using the following steps:
   Example Answer: 'Hakkede tomater: X kg CO2e/ kg \n'.
 - If the ingredient is not found in the database, return '?'.
   Example Answer: 'Chopped tomatoes: ? \n'
+- Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer. 
+  Instead, return the closest match.
 
 Use the following format:
 Ingredients: "Ingredients here"
@@ -141,6 +147,7 @@ Solve the task using the following steps:
 - Match the SQLResult to the list of ingredients based on preparation and type.
 - Return the Answer in the following format: ''ingredient': X kg CO2e / kg'.
 - If the ingredient is not found in the database, return '?'.
+- Do not return any ranges of possible values, only the closest match.
 
 Use the following format:
 Ingredients: "Ingredients here"

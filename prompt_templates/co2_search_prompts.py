@@ -30,4 +30,4 @@ Use the following template for the "Final Answer":
 Begin!
 
 Question: {input}
-{agent_scratchpad}"""
+Thought: {agent_scratchpad}"""

@@ -1,20 +1,24 @@
-from langchain import GoogleSerperAPIWrapper, LLMChain
+from typing import Literal
+
+from langchain import GoogleSearchAPIWrapper, GoogleSerperAPIWrapper, LLMChain
 from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 
 from prompt_templates.co2_search_prompts import SEARCH_AGENT_PREFIX, SEARCH_AGENT_SUFFIX
 
 
-def get_co2_google_search_agent(verbose: bool = False):
-    search_chain = GoogleSerperAPIWrapper(k=10, gl="dk")
-    # search_chain = GoogleSearchAPIWrapper(k=10)
+def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["google", "serper"] = "google"):
+    if search_type == "google":
+        search_chain = GoogleSearchAPIWrapper(k=10, search_engine="google")
+    else:
+        search_chain = GoogleSerperAPIWrapper(k=10, gl="dk")
 
     tools = [
         Tool(
             name="Search tool",
             func=search_chain.run,
             description="""Useful for finding out the kg CO2e / kg for an ingredient.""",
-            coroutine=search_chain.arun,
+            # coroutine=search_chain.arun,
         ),
     ]
 

@@ -1,9 +1,6 @@
 from typing import Literal
 
-from langchain import (  # GoogleSearchAPIWrapper,; GoogleSerperAPIWrapper,
-    LLMChain,
-    LLMMathChain,
-)
+from langchain import LLMChain
 from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 from langchain.utilities import PythonREPL
@@ -22,7 +19,6 @@ from prompt_templates.main_agent import (
 
 
 def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False, async_call: bool = False):
-    math_chain = LLMMathChain.from_llm(llm=ChatOpenAI(temperature=0))  # type: ignore
     python_repl = PythonREPL()
     sql_chain = get_en_co2_sql_chain(language=language, verbose=verbose)
     weight_est_chain = get_en_weight_est(language=language, verbose=verbose)

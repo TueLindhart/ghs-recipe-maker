@@ -1,7 +1,6 @@
 SEARCH_AGENT_PREFIX = """
 Given an ingredient in Danish or English as input, find the kg CO2e per kg of the ingredient by using a search tool and extracting the kg CO2e per kg from the search results.
 
-If you cannot find the kg CO2e per kg of the ingredient, then provide the answer 'CO2e per kg not found'.
 If you find multiple values then choose the most likely result based on what type of ingredient it is.
 
 Here is some information to help you choose the most likely result:
@@ -15,17 +14,18 @@ Here is some information to help you choose the most likely result:
 - Dairy products are usually between 0.5-12.0 kg CO2e per kg.
 
 If you can't estimate what value that is most likely, then provide the value closest to the median of the values.
+If you cannot find the kg CO2e per kg of the ingredient, then provide the final answer 'CO2e per kg not found'.
 
 You have access to the following tools:"""
 
 SEARCH_AGENT_SUFFIX = """
 
 You must search for '{input} kg CO2e per kg' and extract the kg CO2e per kg from the search results.
-Before providing the final answer, explain how you arrived at the answer step by step.
+Before providing the final answer, explain in a though how you arrived at the answer step by step.
 Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer.
 
 Use the following template for the "Final Answer":
-'ingredient': X 'kg CO2e per kg' OR 'CO2e per kg not found' (Explanation of how you found the answer)
+'{input}: X kg CO2e per kg' OR '{input}: CO2e per kg not found'
 
 Begin!
 

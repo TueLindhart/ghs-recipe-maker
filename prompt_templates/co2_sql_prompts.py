@@ -26,8 +26,6 @@ Answer: "Final answer here"
 Only use the following tables:
 {table_info}
 
-
-
 Begin!
 
 Ingredients:

@@ -101,9 +101,9 @@ Stjernefrugt: ? (Not found in database)
 """
 
 
-CO2_SQL_PROMPT_TEMPLATE = """Given a list of ingredients,
-            extract the main ingredients from the list and create a syntactically correct {dialect} query to run,
-            then look at the results of the query and return the answer.
+CO2_SQL_PROMPT_TEMPLATE = """
+Given a list of ingredients in Danish, extract the main ingredients from the list
+and create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
 
 Solve the task using the following steps:
 - Query all ingredients in a single query.
@@ -116,7 +116,7 @@ Solve the task using the following steps:
   Example Answer: {example_answer}
 - If the ingredient is not found in the database, return '?'.
   Example Answer: {example_not_found}
-- Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer.
+- Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer. 
   Instead, return the closest match.
 
 Use the following format:

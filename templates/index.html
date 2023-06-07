@@ -4,25 +4,99 @@
     <title>Recipe CO2 Emission Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      /* Create a CSS spinner */
+      .spinner {
+        border: 8px solid #f3f3f3; /* Half the previous size */
+        border-top: 8px solid #3498db; /* Half the previous size */
+        border-radius: 50%;
+        width: 60px; /* Half the previous size */
+        height: 60px; /* Half the previous size */
+        animation: spin 2s linear infinite;
+        visibility: hidden; /* The spinner should be hidden initially */
+        position: fixed; /* Make the spinner hover over content */
+        left: 50%; /* Center the spinner horizontally */
+        top: 50%; /* Center the spinner vertically */
+        transform: translate(-50%, -50%); /* Correct the spinner position */
+        z-index: 1000; /* Make sure the spinner is above all other content */
+      }
+
+      /* Add a background behind the spinner */
+      #spinnerBackground {
+        position: fixed; /* Cover the whole viewport */
+        top: 0; /* Cover the whole viewport */
+        bottom: 0; /* Cover the whole viewport */
+        left: 0; /* Cover the whole viewport */
+        right: 0; /* Cover the whole viewport */
+        background-color: #000;
+        opacity: 0.5;
+        visibility: hidden;
+        z-index: 999; /* Make sure the background is below the spinner */
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Add styling for the result box */
+      #resultDiv {
+        border: 1px solid #ccc;
+        background-color: #f8f8f8;
+        padding: 15px;
+        margin-top: 15px;
+        white-space: pre-wrap; /* This will allow us to use \n as line break */
+      }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+      const funFacts = [
+        "Fact 1: Did you know...",
+        "Fact 2: Here's an interesting thing...",
+        // Add as many fun facts as you'd like here
+      ];
+      let currentFactIndex = 0;
+
       async function calculateCO2() {
         const urlInput = document.getElementById('urlInput');
         const resultDiv = document.getElementById('resultDiv');
+        const spinner = document.getElementById('spinner');
+        const spinnerBackground = document.getElementById('spinnerBackground');
         const url = urlInput.value;
 
-        // Make request to API
-        const response = await fetch(`/calculate?url=${url}`);
-        const result = await response.text();
+        // Clear resultDiv and display loading message and spinner
+        resultDiv.innerHTML = 'Calculating CO2 Emission...';
+        spinner.style.visibility = 'visible'; /* Show the spinner when calculation begins */
+        spinnerBackground.style.visibility = 'visible'; /* Show the spinner background when calculation begins */
 
-        // Display result
-        resultDiv.innerHTML = `CO2 Emission: ${result} kg`;
+        // Start showing fun facts every 30 seconds
+        const funFactInterval = setInterval(() => {
+          resultDiv.textContent = `Calculating CO2 Emission... ${funFacts[currentFactIndex]}`;
+          currentFactIndex = (currentFactIndex + 1) % funFacts.length;
+        }, 30000);
+
+        // Make request to API
+        try {
+          const response = await fetch(`/calculate?url=${url}`);
+
+          // Display result with \n as line breaks
+          resultDiv.textContent = await response.text();
+        } catch (error) {
+          resultDiv.textContent = `An error occurred: ${error.message}`;
+        } finally {
+          // Stop showing fun facts and hide spinner
+          clearInterval(funFactInterval);
+          spinner.style.visibility = 'hidden'; /* Hide the spinner after calculation ends */
+          spinnerBackground.style.visibility = 'hidden'; /* Hide the spinner background after calculation ends */
+        }
       }
     </script>
   </head>
   <body>
+    <div id="spinnerBackground"></div>
+    <div id="spinner" class="spinner"></div>
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-6 offset-md-3">

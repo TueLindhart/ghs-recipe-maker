@@ -10,12 +10,11 @@ from agent.search_agent import get_co2_google_search_agent
 from chains.co2_search import get_search_agent_tool
 from chains.co2_sql import get_en_co2_sql_chain
 from chains.weight_est import get_en_weight_est
-from prompt_templates.main_agent import (
-    DK_AGENT_PREFIX,
-    DK_AGENT_SUFFIX,
-    EN_AGENT_PREFIX,
-    EN_AGENT_SUFFIX,
-)
+from prompt_templates.main_agent import AGENT_PREFIX, DK_AGENT_SUFFIX, EN_AGENT_SUFFIX
+
+
+def _handle_error(error) -> str:
+    return f"Error: {str(error)}"[:50]
 
 
 def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False, async_call: bool = False):
@@ -70,20 +69,28 @@ def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False
         ),
     ]
 
-    en_prompt = ZeroShotAgent.create_prompt(
+    prompt = ZeroShotAgent.create_prompt(
         tools,
-        prefix=EN_AGENT_PREFIX if language == "en" else DK_AGENT_PREFIX,
+        prefix=AGENT_PREFIX,
         suffix=EN_AGENT_SUFFIX if language == "en" else DK_AGENT_SUFFIX,
         input_variables=["input", "agent_scratchpad"],
     )
 
     llm_chain = LLMChain(
         llm=ChatOpenAI(temperature=0),  # type: ignore
-        prompt=en_prompt,
+        prompt=prompt,
     )
 
     tool_names = [tool.name for tool in tools]
-    agent = ZeroShotAgent(llm_chain=llm_chain, allowed_tools=tool_names)
-    agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=verbose)
+    agent = ZeroShotAgent(
+        llm_chain=llm_chain,
+        allowed_tools=tool_names,
+    )
+    agent_executor = AgentExecutor.from_agent_and_tools(
+        agent=agent,
+        tools=tools,
+        verbose=verbose,
+        # handle_parsing_errors=_handle_error,
+    )
 
     return agent_executor

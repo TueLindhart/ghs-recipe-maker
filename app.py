@@ -1,5 +1,6 @@
-import requests
 from flask import Flask, render_template, request
+
+from estimator import estimator
 
 app = Flask(__name__)
 
@@ -12,8 +13,15 @@ def index():
 @app.route("/calculate")
 def calculate():
     url = request.args.get("url")
-    response = requests.get(f"http://127.0.0.1:8000/predict?url={url}")
-    return response.text
+    if url is None or url == "":
+        return "No URL provided"
+
+    try:
+        result = estimator(url, verbose=False)
+    except Exception:
+        result = "Something went wrong. :-( Please try again."
+
+    return result
 
 
 if __name__ == "__main__":

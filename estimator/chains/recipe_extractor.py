@@ -2,7 +2,7 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.prompt import PromptTemplate
 
-from prompt_templates.recipe_extractor_prompt import RECIPE_EXTRACTOR_PROMPT
+from estimator.prompt_templates.recipe_extractor_prompt import RECIPE_EXTRACTOR_PROMPT
 
 
 def get_recipe_extractor_chain(verbose: bool = False):

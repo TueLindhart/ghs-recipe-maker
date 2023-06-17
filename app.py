@@ -17,7 +17,7 @@ def calculate():
         return "No URL provided"
 
     try:
-        result = estimator(url, verbose=False)
+        result = estimator(url, verbose=True)
     except Exception:
         result = "Something went wrong. :-( Please try again."
 

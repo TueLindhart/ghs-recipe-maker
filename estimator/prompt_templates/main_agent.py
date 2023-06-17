@@ -1,4 +1,4 @@
-from prompt_templates.weight_est_prompts import DK_NEGLIGEBLE, EN_NEGLIGEBLE
+from estimator.prompt_templates.weight_est_prompts import DK_NEGLIGEBLE, EN_NEGLIGEBLE
 
 DK_FINAL_ANSWER_FORMAT = """
 '''

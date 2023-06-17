@@ -1,8 +1,8 @@
 from langdetect import detect
 
-from agent import get_co2_estimator_agent
-from chains.recipe_extractor import get_recipe_extractor_chain
-from utils import get_url_text
+from estimator.agent import get_co2_estimator_agent
+from estimator.chains.recipe_extractor import get_recipe_extractor_chain
+from estimator.utils import get_url_text
 
 
 def estimator(url: str, verbose: bool = False):
@@ -55,7 +55,8 @@ if __name__ == "__main__":
     from time import time
 
     start_time = time()
-    url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
+    # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
+    url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
     print(estimator(url, verbose=True))
     end_time = time()
 

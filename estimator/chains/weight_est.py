@@ -3,7 +3,7 @@ from typing import Literal
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 
-from prompt_templates.weight_est_prompts import (
+from estimator.prompt_templates.weight_est_prompts import (
     DK_WEIGHT_EST_PROMPT,
     EN_WEIGHT_EST_PROMPT,
 )

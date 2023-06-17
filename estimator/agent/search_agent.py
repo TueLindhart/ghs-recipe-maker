@@ -4,7 +4,10 @@ from langchain import GoogleSearchAPIWrapper, GoogleSerperAPIWrapper, LLMChain
 from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 
-from prompt_templates.co2_search_prompts import SEARCH_AGENT_PREFIX, SEARCH_AGENT_SUFFIX
+from estimator.prompt_templates.co2_search_prompts import (
+    SEARCH_AGENT_PREFIX,
+    SEARCH_AGENT_SUFFIX,
+)
 
 
 def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["google", "serper"] = "google"):

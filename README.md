@@ -1,1 +1,1 @@
-# ghs-recipe-maker
+# Greenhouse gas recipe estimator

@@ -8,7 +8,10 @@ from langchain.tools import tool
 
 
 def get_url_text(url: str, text_length: int = 1000):  # Expand text length when it needs to estmate CO2 of cooking methods
-    html = requests.get(url).text
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
+
+    html = requests.get(url, headers=headers).text
+    # html = requests.get(url).text
     soup = BeautifulSoup(html, features="html.parser")
 
     # kill all script and style elements

@@ -16,10 +16,11 @@ def calculate():
     if url is None or url == "":
         return "No URL provided"
 
-    try:
-        result = estimator(url, verbose=True)
-    except Exception:
-        result = "Something went wrong. :-( Please try again."
+    result = estimator(url, verbose=True)
+    # try:
+    # result = estimator(url, verbose=True)
+    # except Exception:
+    # result = "Something went wrong. :-( Please try again."
 
     return result
 

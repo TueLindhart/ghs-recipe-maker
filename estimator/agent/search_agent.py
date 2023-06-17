@@ -10,7 +10,7 @@ from estimator.prompt_templates.co2_search_prompts import (
 )
 
 
-def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["google", "serper"] = "google"):
+def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["google", "serper"] = "serper"):
     if search_type == "google":
         search_chain = GoogleSearchAPIWrapper(k=20, search_engine="google")
     else:
@@ -41,3 +41,9 @@ def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["goo
     agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=verbose)
 
     return agent_executor
+
+
+if __name__ == "__main__":
+    search = GoogleSearchAPIWrapper(k=20, search_engine="google")
+
+    search.run("basilikum kg CO2e per kg")

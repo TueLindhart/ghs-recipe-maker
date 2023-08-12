@@ -1,7 +1,8 @@
-from langchain import PromptTemplate
+from typing import List
 
-DK_NEGLIGEBLE = "negligerbar"
-EN_NEGLIGEBLE = "negligible"
+from langchain import PromptTemplate
+from langchain.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
 
 EN_WEIGHT_RECALCULATIONS = """
 1 can = 400 g = 0.4 kg
@@ -82,55 +83,184 @@ peber
 """
 
 DK_ANSWER_EXAMPLE = """
-1 dåse hakkede tomater: 1 dåse = 400 g = 0.4 kg
-200 g pasta: 200 g = 0.2 kg
-500 ml vand: 500 ml = 0.5 kg
-250 gram hakket kød: 250 g = 0.25 kg
-0.5 blomkål: 1 blomkål = 500 g (estimeret af LLM model) = 0.5 kg
-1 tsk. sukker: 1 teskefuld = 5 g = 0.005 kg som er mindre end 0.050 kg, negligerbar
-1 økologisk citron: 1 citron = 85 g = 0.085 kg
-3 teskefulde salt: 1 tsk. = 5 g, 3 * 5 g = 15 g = 0.015 kg som er mindre end 0.050 kg, negligerbar
-2 spsk. krydderi: 1 spsk. = 15 g, 2 * 15 g = 30 g = 0.030 kg som er mindre end 0.050 kg, negligerbar
-peber: antal ikke angivet, negligerbar
-2 store kartofler: 1 stor kartoffel = 300 g, 2 * 300 g = 600 g = 0.6 kg
-1 bdt asparges: 1 bdt asparges = 500 g = 0.500 kg
+{
+  "weight_estimates": [
+    {
+      "ingredient": "1 dåse hakkede tomater",
+      "weight_calculation": "1 dåse = 400 g = 0.4 kg",
+      "weight_in_kg": "0.4 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "200 g pasta",
+      "weight_calculation": "200 g = 0.2 kg",
+      "weight_in_kg": "0.2 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "500 ml vand",
+      "weight_calculation": "500 ml = 0.5 kg",
+      "weight_in_kg": "0.5 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "250 gram hakket kød",
+      "weight_calculation": "250 g = 0.25 kg",
+      "weight_in_kg": "0.25 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "0.5 blomkål",
+      "weight_calculation": "1 blomkål = 500 g (estimeret af LLM model) = 0.5 kg",
+      "weight_in_kg": "0.5 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "1 tsk. sukker",
+      "weight_calculation": "1 teskefuld = 5 g = 0.005 kg som er mindre end 0.010 kg",
+      "weight_in_kg": "0.005 kg",
+      "negligeble": true
+    },
+    {
+      "ingredient": "1 økologisk citron",
+      "weight_calculation": "1 citron = 85 g = 0.085 kg",
+      "weight_in_kg": "0.085 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "3 teskefulde salt",
+      "weight_calculation": "1 tsk. = 5 g, 3 * 5 g = 15 g = 0.015 kg som er mindre end 0.010 kg",
+      "weight_in_kg": "0.015 kg",
+      "negligeble": true
+    },
+    {
+      "ingredient": "2 spsk. krydderi",
+      "weight_calculation": "1 spsk. = 15 g, 2 * 15 g = 30 g = 0.030 kg som er mindre end 0.010 kg",
+      "weight_in_kg": "0.030 kg",
+      "negligeble": true
+    },
+    {
+      "ingredient": "peber",
+      "weight_calculation": "antal ikke angivet, negligeble",
+      "weight_in_kg": "",
+      "negligeble": true
+    },
+    {
+      "ingredient": "2 store kartofler",
+      "weight_calculation": "1 stor kartoffel = 300 g, 2 * 300 g = 600 g = 0.6 kg",
+      "weight_in_kg": "0.6 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "1 bdt asparges",
+      "weight_calculation": "1 bdt asparges = 500 g = 0.500 kg",
+      "weight_in_kg": "0.500 kg",
+      "negligeble": false
+    }
+  ]
+}
+
+
 """
 
 EN_ANSWER_EXAMPLE = """
-1 can chopped tomatoes: 1 can = 400 g = 0.4 kg
-200 g pasta: 200 g = 0.2 kg
-500 ml water: 500 ml = 0.5 kg
-250 grams minced meat: 250 g = 0.25 kg
-0.5 cauliflower: 1 cauliflower = 500 g (estimated by LLM model) = 0.5 kg
-1 tsp. sugar: 1 teaspoon = 5 g = 0.005 kg which is less than 0.050 kg, negligible
-1 organic lemon: 1 lemon = 85 g = 0.085 kg
-3 teaspoons salt: 1 tsp. = 5 g, 3 * 5 g = 15 g = 0.015 kg which is less than 0.050 kg, negligible
-2 tbsp. spices: 1 tbsp. = 15 g, 2 * 15 g = 30 g = 0.030 kg which is less than 0.050 kg, negligible
-pepper: quantity not specified, negligible
-2 large potatoes: 1 large potato = 300 g, 2 * 300 g = 600 g = 0.6 kg
-1 bunch asparagus: 1 bunch asparagus = 500 g = 0.500 kg
+{
+  "weight_estimates": [
+    {
+      "ingredient": "1 can chopped tomatoes",
+      "weight_calculation": "1 can = 400 g = 0.4 kg",
+      "weight_in_kg": "0.4 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "200 g pasta",
+      "weight_calculation": "200 g = 0.2 kg",
+      "weight_in_kg": "0.2 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "500 ml water",
+      "weight_calculation": "500 ml = 0.5 kg",
+      "weight_in_kg": "0.5 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "250 grams minced meat",
+      "weight_calculation": "250 g = 0.25 kg",
+      "weight_in_kg": "0.25 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "0.5 cauliflower",
+      "weight_calculation": "1 cauliflower = 500 g (estimated by LLM model) = 0.5 kg",
+      "weight_in_kg": "0.5 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "1 tsp. sugar",
+      "weight_calculation": "1 teaspoon = 5 g = 0.005 kg which is less than 0.010 kg",
+      "weight_in_kg": "0.005 kg",
+      "negligeble": true
+    },
+    {
+      "ingredient": "1 organic lemon",
+      "weight_calculation": "1 lemon = 85 g = 0.085 kg",
+      "weight_in_kg": "0.085 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "3 teaspoons salt",
+      "weight_calculation": "1 tsp. = 5 g, 3 * 5 g = 15 g = 0.015 kg which is less than 0.010 kg",
+      "weight_in_kg": "0.015 kg",
+      "negligeble": true
+    },
+    {
+      "ingredient": "2 tbsp. spices",
+      "weight_calculation": "1 tbsp. = 15 g, 2 * 15 g = 30 g = 0.030 kg which is less than 0.010 kg",
+      "weight_in_kg": "0.030 kg",
+      "negligeble": true
+    },
+    {
+      "ingredient": "pepper",
+      "weight_calculation": "quantity not specified",
+      "weight_in_kg": "",
+      "negligeble": true
+    },
+    {
+      "ingredient": "2 large potatoes",
+      "weight_calculation": "1 large potato = 300 g, 2 * 300 g = 600 g = 0.6 kg",
+      "weight_in_kg": "0.6 kg",
+      "negligeble": false
+    },
+    {
+      "ingredient": "1 bunch asparagus",
+      "weight_calculation": "1 bunch asparagus = 500 g = 0.500 kg",
+      "weight_in_kg": "0.500 kg",
+      "negligeble": false
+    }
+  ]
+}
+
+
 """
 
 WEIGHT_EST_PROMPT = """
 Given a list of ingredients, estimate the weights in kilogram for each ingredient.
-Explain your reasoning for the estimation of weights and why you estimate some ingredients to be {negligible}.
+Explain your reasoning for the estimation of weights and why you estimate some ingredients to be "negligible".
 
 The following general weights can be used for estimation:
 {recalculations}
 
-Ingredients that weight less than 10 gram/g or 0.01 kilogram/kg should be called '{negligible}'.
+Ingredients that weight less than 10 g or 0.01 kg should be called 'negligible'.
 If an ingredient is not found in the list of general weights, try to give your best estimate
 of the weight in kilogram/kg of the ingredient and say (estimated by LLM model).
 
-Use the following format:
-Ingredients: "Ingredients here"
-Answer: "Final answer here"
+Input is given after "Ingredients:"
 
-Begin!
+{format_instructions}
 
 Ingredients:
 {input_example}
-
 
 Answer:
 {answer_example}
@@ -139,14 +269,29 @@ Ingredients:
 {input}
 """
 
+
+class WeightEstimate(BaseModel):
+    ingredient: str = Field(description="Ingredient as called in ingredient list")
+    weight_calculation: str = Field(description="Description of how weights are estimated")
+    weight_in_kg: str = Field(description="Weight provided in kg")
+    negligeble: bool = Field(description="Wether the ingredients is negligeble (True) or not (False)")
+
+
+class WeightEstimates(BaseModel):
+    weight_estimates: List[WeightEstimate] = Field(description="List of 'WeightEstimate' per ingredient.")
+
+
+weight_output_parser = PydanticOutputParser(pydantic_object=WeightEstimates)
+
+
 DK_WEIGHT_EST_PROMPT = PromptTemplate(
     template=WEIGHT_EST_PROMPT,
     input_variables=["input"],
     partial_variables={
-        "negligible": DK_NEGLIGEBLE,
         "recalculations": DK_WEIGHT_RECALCULATIONS,
         "input_example": DK_INPUT_EXAMPLE,
         "answer_example": DK_ANSWER_EXAMPLE,
+        "format_instructions": weight_output_parser.get_format_instructions(),
     },
 )
 
@@ -154,9 +299,9 @@ EN_WEIGHT_EST_PROMPT = PromptTemplate(
     template=WEIGHT_EST_PROMPT,
     input_variables=["input"],
     partial_variables={
-        "negligible": EN_NEGLIGEBLE,
         "recalculations": EN_WEIGHT_RECALCULATIONS,
         "input_example": EN_INPUT_EXAMPLE,
         "answer_example": EN_ANSWER_EXAMPLE,
+        "format_instructions": weight_output_parser.get_format_instructions(),
     },
 )

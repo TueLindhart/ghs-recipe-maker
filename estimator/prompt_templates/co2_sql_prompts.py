@@ -1,4 +1,8 @@
+from typing import List
+
 from langchain import PromptTemplate
+from langchain.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
 
 EN_EXAMPLE_QUERY = "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
 DK_EXAMPLE_QUERY = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
@@ -82,23 +86,98 @@ DK_SQL_RESULT_EXAMPLE = """
 """
 
 EN_FINAL_ANSWER_EXAMPLE = """
-Red lentils: 1.78 kg CO2e / kg
-Chopped tomatoes: 1.26 kg CO2e / kg
-Vegetable bouillon: 0.38 kg CO2e / kg (closest was chicken bouillon)
-Tomato concentrate (140 g): 2.48 kg CO2e / kg (closest was tomato paste)
-Lemon juice: 0.94 kg CO2e / kg (Closest was Lemon, raw)
-Starfruit: ? (Not found in database)
+{
+  "emissions": [
+    {
+      "ingredient": "Red lentils",
+      "co2_per_kg": "1.78 kg CO2e / kg",
+      "comment": ""
+    },
+    {
+      "ingredient": "Chopped tomatoes",
+      "co2_per_kg": "1.26 kg CO2e / kg",
+      "comment": ""
+    },
+    {
+      "ingredient": "Vegetable bouillon",
+      "co2_per_kg": "0.38 kg CO2e / kg",
+      "comment": "closest was chicken bouillon"
+    },
+    {
+      "ingredient": "Tomato concentrate (140 g)",
+      "co2_per_kg": "2.48 kg CO2e / kg",
+      "comment": "closest was tomato paste"
+    },
+    {
+      "ingredient": "Lemon juice",
+      "co2_per_kg": "0.94 kg CO2e / kg",
+      "comment": "Closest was Lemon, raw"
+    },
+    {
+      "ingredient": "Starfruit",
+      "co2_per_kg": "?",
+      "comment": "Not found in database"
+    }
+  ]
+}
+
 """
 
 DK_FINAL_ANSWER_EXAMPLE = """
-Røde linser: 1.78 kg CO2e / kg
-Hakkede tomater: 1.26 kg CO2e / kg
-Grøntsagsbouillon: 0.38 kg CO2e / kg (closest was chicken bouillon)
-Tomatkoncentrat: 2.48 kg CO2e / kg (closest was tomato paste)
-Citronsaft: 0.94 kg CO2e / kg (Closest was Lemon, raw)
-Majstortillas: 0.74 kg CO2e / kg (Closest was Tortillabrød, hvede)
-Stjernefrugt: ? (Not found in database)
+{
+  "emissions": [
+    {
+      "ingredient": "Red lentils",
+      "co2_per_kg": "1.78 kg CO2e / kg",
+      "comment": ""
+    },
+    {
+      "ingredient": "Chopped tomatoes",
+      "co2_per_kg": "1.26 kg CO2e / kg",
+      "comment": ""
+    },
+    {
+      "ingredient": "Vegetable bouillon",
+      "co2_per_kg": "0.38 kg CO2e / kg",
+      "comment": "closest was chicken bouillon"
+    },
+    {
+      "ingredient": "Tomato concentrate",
+      "co2_per_kg": "2.48 kg CO2e / kg",
+      "comment": "closest was tomato paste"
+    },
+    {
+      "ingredient": "Lemon juice",
+      "co2_per_kg": "0.94 kg CO2e / kg",
+      "comment": "Closest was Lemon, raw"
+    },
+    {
+      "ingredient": "Corn tortillas",
+      "co2_per_kg": "0.74 kg CO2e / kg",
+      "comment": "Closest was Wheat Tortilla, hvede"
+    },
+    {
+      "ingredient": "Starfruit",
+      "co2_per_kg": "?",
+      "comment": "Not found in database"
+    }
+  ]
+}
+
 """
+
+
+class CO2perKg(BaseModel):
+    ingredient: str = Field(description="Name of ingredient")
+    co2_per_kg: str = Field(description="kg CO2 per kg for ingredient. '?' if result not found")
+    comment: str = Field(description="Comment about result. For instance what closest result is.")
+
+
+class CO2Emissions(BaseModel):
+    emissions: List[CO2perKg]
+
+
+co2_output_parser = PydanticOutputParser(pydantic_object=CO2Emissions)
 
 
 CO2_SQL_PROMPT_TEMPLATE = """
@@ -116,17 +195,18 @@ Solve the task using the following steps:
   Example Answer: {example_answer}
 - If the ingredient is not found in the database, return '?'.
   Example Answer: {example_not_found}
-- Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer. 
+- Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer.
   Instead, return the closest match.
 
 Use the following format:
 Ingredients: "Ingredients here"
 SQLQuery: "SQL Query to run"
 SQLResult: "Result of the SQLQuery"
-Final Answer: "Final answer here"
 
 Only use the following tables:
 {table_info}
+
+{format_instructions}
 
 Begin!
 
@@ -137,7 +217,6 @@ SQLQuery: {query_example}
 
 SQLResult: {query_result_example}
 
-Final Answer:
 {final_answer_example}
 
 Ingredients: {input}"""
@@ -154,6 +233,7 @@ EN_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "ingredients_example": EN_INGREDIENTS_EXAMPLE,
         "query_example": EN_SQL_QUERY_EXAMPLE,
         "query_result_example": EN_SQL_RESULT_EXAMPLE,
+        "format_instructions": co2_output_parser.get_format_instructions(),
         "final_answer_example": EN_FINAL_ANSWER_EXAMPLE,
     },
 )
@@ -170,6 +250,7 @@ DK_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "ingredients_example": DK_INGREDIENTS_EXAMPLE,
         "query_example": DK_SQL_QUERY_EXAMPLE,
         "query_result_example": DK_SQL_RESULT_EXAMPLE,
+        "format_instructions": co2_output_parser.get_format_instructions(),
         "final_answer_example": DK_FINAL_ANSWER_EXAMPLE,
     },
 )

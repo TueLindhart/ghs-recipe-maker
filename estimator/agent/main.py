@@ -8,8 +8,8 @@ from langchain.utilities import PythonREPL
 # from agent.search_agent import get_co2_google_search_agent
 from estimator.agent.search_agent import get_co2_google_search_agent
 from estimator.chains.co2_search import get_search_agent_tool
-from estimator.chains.co2_sql import get_en_co2_sql_chain
-from estimator.chains.weight_est import get_en_weight_est
+from estimator.chains.co2_sql import get_co2_sql_chain
+from estimator.chains.weight_est import get_weight_est
 from estimator.prompt_templates.main_agent import (
     AGENT_PREFIX,
     DK_AGENT_SUFFIX,
@@ -23,8 +23,8 @@ def _handle_error(error) -> str:
 
 def get_co2_estimator_agent(language: Literal["da", "en"], verbose: bool = False, async_call: bool = False):
     python_repl = PythonREPL()
-    sql_chain = get_en_co2_sql_chain(language=language, verbose=verbose)
-    weight_est_chain = get_en_weight_est(language=language, verbose=verbose)
+    sql_chain = get_co2_sql_chain(language=language, verbose=verbose)
+    weight_est_chain = get_weight_est(language=language, verbose=verbose)
     # search_chain = GoogleSerperAPIWrapper(k=10, gl="dk")
 
     search_tool = get_search_agent_tool(search_agent=get_co2_google_search_agent(verbose=verbose))

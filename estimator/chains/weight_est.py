@@ -9,7 +9,7 @@ from estimator.prompt_templates.weight_est_prompts import (
 )
 
 
-def get_en_weight_est(language: Literal["da", "en"], verbose: bool = False):
+def get_weight_est(language: Literal["da", "en"], verbose: bool = False):
     llm = ChatOpenAI(  # type: ignore
         temperature=0,
     )

@@ -51,20 +51,26 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+
     <script>
       const funFacts = [
-      "Did you know that approximately one-third of all food produced globally goes to waste, often because it's deemed 'unattractive' for sale. By purchasing and consuming 'ugly' fruits and vegetables, we can help reduce food waste.",
-      "Did you know that insects like crickets, mealworms, and locusts are rich in protein, vitamins, and minerals. They require significantly less land, water, and feed compared to traditional livestock, making them a sustainable source of nutrition.",
-      "Did you know that plant-based burgers, like those from Beyond Meat or Impossible Foods, produce approximately 90% fewer greenhouse gas emissions and use 46% less energy compared to beef burgers.",
-      "Did you know that used coffee grounds can be repurposed as a natural fertilizer, insect repellent, and even a skin exfoliant. They're a sustainable way to reuse waste from your morning cup!",
-      "Did you know that grains like quinoa, amaranth, and millet are drought-tolerant and nutrient-rich, making them sustainable choices in regions with water scarcity.",
-      "Did you know that regenerative agriculture focuses on restoring soil health, increasing biodiversity, and enhancing ecosystems. It can even capture more carbon dioxide than it emits, helping to combat climate change.",
-      "Did you know that vertical farming involves growing crops in stacked layers, often in controlled indoor environments. It can reduce the need for pesticides, save space, and provide fresh produce in urban areas.",
-      "Did you know that overfishing is a significant concern for ocean ecosystems. Organizations like the Monterey Bay Aquarium's Seafood Watch provide guidelines for consumers to select sustainably-sourced seafood.",
-      "Did you know that some companies are now using mycelium, the root system of mushrooms, to create sustainable packaging materials. They're biodegradable, compostable, and an eco-friendly alternative to plastic.",
-      "Did you know that natural cork, used in wine bottles, is harvested from the bark of the cork oak tree without cutting the tree down. Harvesting cork can actually benefit the tree's health and lifespan, making it a sustainable choice for sealing wines."
+      "approximately one-third of all food produced globally goes to waste, often because it's deemed 'unattractive' for sale. By purchasing and consuming 'ugly' fruits and vegetables, we can help reduce food waste.",
+      "insects like crickets, mealworms, and locusts are rich in protein, vitamins, and minerals. They require significantly less land, water, and feed compared to traditional livestock, making them a sustainable source of nutrition.",
+      "plant-based burgers, like those from Beyond Meat or Impossible Foods, produce approximately 90% fewer greenhouse gas emissions and use 46% less energy compared to beef burgers.",
+      "used coffee grounds can be repurposed as a natural fertilizer, insect repellent, and even a skin exfoliant. They're a sustainable way to reuse waste from your morning cup!",
+      "grains like quinoa, amaranth, and millet are drought-tolerant and nutrient-rich, making them sustainable choices in regions with water scarcity.",
+      "regenerative agriculture focuses on restoring soil health, increasing biodiversity, and enhancing ecosystems. It can even capture more carbon dioxide than it emits, helping to combat climate change.",
+      "vertical farming involves growing crops in stacked layers, often in controlled indoor environments. It can reduce the need for pesticides, save space, and provide fresh produce in urban areas.",
+      "overfishing is a significant concern for ocean ecosystems. Organizations like the Monterey Bay Aquarium's Seafood Watch provide guidelines for consumers to select sustainably-sourced seafood.",
+      "some companies are now using mycelium, the root system of mushrooms, to create sustainable packaging materials. They're biodegradable, compostable, and an eco-friendly alternative to plastic.",
+      "natural cork, used in wine bottles, is harvested from the bark of the cork oak tree without cutting the tree down. Harvesting cork can actually benefit the tree's health and lifespan, making it a sustainable choice for sealing wines."
     ];
       let currentFactIndex = 0;
+
+      function hash_url(url) {
+        return CryptoJS.MD5(url).toString();
+    }
 
       async function calculateCO2() {
         const urlInput = document.getElementById('urlInput');
@@ -74,31 +80,51 @@
         const url = urlInput.value;
 
         // Clear resultDiv and display loading message and spinner
-        resultDiv.innerHTML = 'Calculating CO2 Emission...';
-        spinner.style.visibility = 'visible'; /* Show the spinner when calculation begins */
-        spinnerBackground.style.visibility = 'visible'; /* Show the spinner background when calculation begins */
+        resultDiv.innerHTML = 'Calculating CO2 Emission (will take a minute or two) ...';
+        spinner.style.visibility = 'visible';
+        spinnerBackground.style.visibility = 'visible';
 
         // Start showing fun facts every 30 seconds
         const funFactInterval = setInterval(() => {
-          resultDiv.textContent = `Calculating CO2 Emission... ${funFacts[currentFactIndex]}`;
-          currentFactIndex = (currentFactIndex + 1) % funFacts.length;
+            resultDiv.textContent = `Still working ... but did you know that ${funFacts[currentFactIndex]}`;
+            currentFactIndex = (currentFactIndex + 1) % funFacts.length;
         }, 30000);
 
-        // Make request to API
+        // Make request to start calculation
         try {
-          const response = await fetch(`/calculate?url=${url}`);
-
-          // Display result with \n as line breaks
-          resultDiv.textContent = await response.text();
+            const response = await fetch(`/calculate?url=${url}`);
+            if (response.status === 202) {
+                const urlHash = hash_url(url);
+                pollForResult(urlHash, resultDiv, funFactInterval, spinner, spinnerBackground);
+            } else {
+                resultDiv.textContent = 'Error starting estimation';
+            }
         } catch (error) {
-          resultDiv.textContent = `An error occurred: ${error.message}`;
-        } finally {
-          // Stop showing fun facts and hide spinner
-          clearInterval(funFactInterval);
-          spinner.style.visibility = 'hidden'; /* Hide the spinner after calculation ends */
-          spinnerBackground.style.visibility = 'hidden'; /* Hide the spinner background after calculation ends */
+            resultDiv.textContent = `An error occurred: ${error.message}`;
         }
-      }
+    }
+
+    async function pollForResult(urlHash, resultDiv, funFactInterval, spinner, spinnerBackground) {
+        try {
+            const response = await fetch(`/results/${urlHash}`);
+            const data = await response.json();
+            if (response.status === 202 && data.status === 'Processing') {
+                setTimeout(() => {
+                    pollForResult(urlHash, resultDiv, funFactInterval, spinner, spinnerBackground);
+                }, 2000); // 2 seconds
+            } else {
+                // Display result
+                resultDiv.textContent = data.result;
+            }
+        } catch (error) {
+            resultDiv.textContent = `An error occurred: ${error.message}`;
+        } finally {
+            // Stop showing fun facts and hide spinner
+            clearInterval(funFactInterval);
+            spinner.style.visibility = 'hidden';
+            spinnerBackground.style.visibility = 'hidden';
+        }
+    }
     </script>
   </head>
   <body>

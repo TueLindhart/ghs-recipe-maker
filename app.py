@@ -1,10 +1,33 @@
-from flask import Flask, render_template, request
+import asyncio
+import hashlib
+import threading
 
-from estimator import (
-    async_estimator,  # This is a hypothetical async version of your estimator function
-)
+from flask import Flask, jsonify, render_template, request
+
+from estimator import async_estimator
 
 app = Flask(__name__)
+
+results = {}  # Temporary storage for results
+
+
+def hash_url(url):
+    """Generate a short hash from a URL."""
+    return hashlib.md5(url.encode()).hexdigest()
+
+
+def run_in_thread(func, url):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    hashed_url = hash_url(url)
+    try:
+        result = loop.run_until_complete(func(url, verbose=True))
+        results[hashed_url] = result
+    except Exception as exc_info:
+        print(str(exc_info))
+        results[hashed_url] = "Something went wrong. :-( Please try again."
+    finally:
+        loop.close()
 
 
 @app.route("/")
@@ -18,13 +41,18 @@ async def calculate():
     if url is None or url == "":
         return "No URL provided"
 
-    try:
-        result = await async_estimator(url, verbose=True)  # This assumes estimator is also async
-    except Exception as exc_info:
-        print(str(exc_info))
-        result = "Something went wrong. :-( Please try again."
+    threading.Thread(target=run_in_thread, args=(async_estimator, url)).start()
 
-    return result
+    return jsonify(status="Processing", url=url), 202  # Return 202 Accepted status
+
+
+@app.route("/results/<hashed_url>")
+async def get_results(hashed_url):
+    result = results.get(hashed_url, None)
+    if result:
+        return jsonify(status="Completed", result=result)  # Return as a JSON object
+    else:
+        return jsonify(status="Processing", url=hashed_url), 202  # Maintain consistency with a JSON response
 
 
 if __name__ == "__main__":

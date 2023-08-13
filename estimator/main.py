@@ -49,7 +49,11 @@ def estimator(
     try:
         # Estimate the kg CO2e per kg for each weight ingredien
         co2_sql_chain = get_co2_sql_chain(language=language, verbose=verbose)
-        co2_query_input = [item.ingredient for item in parsed_weight_output.weight_estimates if item.weight_in_kg is not None and item.weight_in_kg > negligeble_threshold]
+        co2_query_input = [
+            item.ingredient
+            for item in parsed_weight_output.weight_estimates
+            if item.weight_in_kg is not None and item.weight_in_kg > negligeble_threshold
+        ]
         co2_query_input_str = str(co2_query_input)
         sql_output = co2_sql_chain.run(co2_query_input_str)
         parsed_sql_output = co2_output_parser.parse(sql_output)
@@ -114,7 +118,11 @@ async def async_estimator(
     try:
         # Estimate the kg CO2e per kg for each weight ingredien
         co2_sql_chain = get_co2_sql_chain(language=language, verbose=verbose)
-        co2_query_input = [item.ingredient for item in parsed_weight_output.weight_estimates if item.weight_in_kg is not None and item.weight_in_kg > negligeble_threshold]
+        co2_query_input = [
+            item.ingredient
+            for item in parsed_weight_output.weight_estimates
+            if item.weight_in_kg is not None and item.weight_in_kg > negligeble_threshold
+        ]
         co2_query_input_str = str(co2_query_input)
         sql_output = co2_sql_chain.run(
             co2_query_input_str,

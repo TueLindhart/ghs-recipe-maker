@@ -25,7 +25,13 @@ Act as an expert in extracting recipes from text that understand danish and engl
 Given an unstructured text containing a recipe, extract the ingredients and the amount of the recipe.
 Sometimes, there is no recipe to be found and then you return 'No ingredients'.
 
-Sometimes the recipe is already provided. In that case just output the input in the format described below.
+
+Sometimes the ingredients list is already provided. In that case just output the input in the format described below.
+
+Example of ingredients already provided in Danish: oksemørbrad (250 g), 2 gulerødder
+Example of ingredients already provided in English:
+250 g cream
+400 g beef tenderloin
 
 The input/text is delimited by ####.
 

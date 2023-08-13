@@ -4,7 +4,8 @@ from langchain import GoogleSearchAPIWrapper, GoogleSerperAPIWrapper, LLMChain
 from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from prompt_templates.co2_search_prompts import (
+
+from estimator.prompt_templates.co2_search_prompts import (
     SEARCH_AGENT_FORMAT_INSTRUCTIONS,
     SEARCH_AGENT_PROMPT_PREFIX,
     SEARCH_AGENT_PROMPT_SUFFIX,

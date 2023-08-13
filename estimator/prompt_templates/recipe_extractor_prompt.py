@@ -23,7 +23,7 @@ recipe_output_parser = CommaSeparatedListOutputParser()
 RECIPE_EXTRACTOR_PROMPT = """
 Act as an expert in extracting recipes from text that understand danish and english.
 Given an unstructured text containing a recipe, extract the ingredients and the amount of the recipe.
-Sometimes, there is no recipe to be found and then you return an empty python list ([]).
+Sometimes, there is no recipe to be found and then you return 'No ingredients'.
 
 Sometimes the recipe is already provided. In that case just output the input in the format described below.
 

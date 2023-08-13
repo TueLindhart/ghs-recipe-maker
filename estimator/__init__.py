@@ -1,1 +1,1 @@
-from estimator.main import estimator
+from estimator.main import async_estimator, estimator

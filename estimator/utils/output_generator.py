@@ -1,8 +1,8 @@
 from typing import List
 
-from prompt_templates.co2_search_prompts import CO2SearchResult
-from prompt_templates.co2_sql_prompts import CO2Emissions
-from prompt_templates.weight_est_prompts import WeightEstimates
+from estimator.prompt_templates.co2_search_prompts import CO2SearchResult
+from estimator.prompt_templates.co2_sql_prompts import CO2Emissions
+from estimator.prompt_templates.weight_est_prompts import WeightEstimates
 
 
 def generate_output(

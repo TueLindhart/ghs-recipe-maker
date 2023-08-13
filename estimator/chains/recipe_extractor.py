@@ -1,7 +1,8 @@
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.prompt import PromptTemplate
-from prompt_templates.recipe_extractor_prompt import (
+
+from estimator.prompt_templates.recipe_extractor_prompt import (
     RECIPE_EXTRACTOR_PROMPT,
     recipe_output_parser,
 )

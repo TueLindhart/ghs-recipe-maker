@@ -53,10 +53,17 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
       const funFacts = [
-        "Fact 1: Did you know...",
-        "Fact 2: Here's an interesting thing...",
-        // Add as many fun facts as you'd like here
-      ];
+      "Did you know that approximately one-third of all food produced globally goes to waste, often because it's deemed 'unattractive' for sale. By purchasing and consuming 'ugly' fruits and vegetables, we can help reduce food waste.",
+      "Did you know that insects like crickets, mealworms, and locusts are rich in protein, vitamins, and minerals. They require significantly less land, water, and feed compared to traditional livestock, making them a sustainable source of nutrition.",
+      "Did you know that plant-based burgers, like those from Beyond Meat or Impossible Foods, produce approximately 90% fewer greenhouse gas emissions and use 46% less energy compared to beef burgers.",
+      "Did you know that used coffee grounds can be repurposed as a natural fertilizer, insect repellent, and even a skin exfoliant. They're a sustainable way to reuse waste from your morning cup!",
+      "Did you know that grains like quinoa, amaranth, and millet are drought-tolerant and nutrient-rich, making them sustainable choices in regions with water scarcity.",
+      "Did you know that regenerative agriculture focuses on restoring soil health, increasing biodiversity, and enhancing ecosystems. It can even capture more carbon dioxide than it emits, helping to combat climate change.",
+      "Did you know that vertical farming involves growing crops in stacked layers, often in controlled indoor environments. It can reduce the need for pesticides, save space, and provide fresh produce in urban areas.",
+      "Did you know that overfishing is a significant concern for ocean ecosystems. Organizations like the Monterey Bay Aquarium's Seafood Watch provide guidelines for consumers to select sustainably-sourced seafood.",
+      "Did you know that some companies are now using mycelium, the root system of mushrooms, to create sustainable packaging materials. They're biodegradable, compostable, and an eco-friendly alternative to plastic.",
+      "Did you know that natural cork, used in wine bottles, is harvested from the bark of the cork oak tree without cutting the tree down. Harvesting cork can actually benefit the tree's health and lifespan, making it a sustainable choice for sealing wines."
+    ];
       let currentFactIndex = 0;
 
       async function calculateCO2() {
@@ -103,7 +110,7 @@
           <h1 class="text-center mb-4">Recipe CO2 Emission Calculator</h1>
           <form>
             <div class="form-group">
-              <label for="urlInput">Enter recipe URL:</label>
+              <label for="urlInput">Enter recipe URL or the ingredients manually:</label>
               <input type="text" class="form-control" id="urlInput" name="urlInput">
             </div>
             <button type="button" class="btn btn-primary btn-block" onclick="calculateCO2()">Calculate CO2 Emission</button>

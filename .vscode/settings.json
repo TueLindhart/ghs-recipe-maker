@@ -1,14 +1,15 @@
 {
     "python.envFile": "${workspaceFolder}/.env",
-    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
-    "python.linting.enabled": true,
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--line-length",
-        "180"
-    ],
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Args": [
-        "--max-line-length=180"
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "gitlens.codeLens.symbolScopes": [
+            "!Module"
+        ],
+        "editor.formatOnType": true,
+        "editor.wordBasedSuggestions": false,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+    },
+    "flake8.args": [
+        "--config=.flake8"
     ]
 }

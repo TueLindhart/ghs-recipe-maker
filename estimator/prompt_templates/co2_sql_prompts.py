@@ -1,8 +1,11 @@
-from typing import List
+from typing import List, Optional
 
 from langchain import PromptTemplate
 from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
+
+EN_LANGUAGE = "English"
+DK_LANGUAGE = "Danish"
 
 EN_EXAMPLE_QUERY = "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
 DK_EXAMPLE_QUERY = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
@@ -13,11 +16,11 @@ DK_EXAMPLE_REMOVING = "'%hakkede tomater%' to '%tomat%' or '%hakket oksekød%' t
 EN_EXAMPLE_MATCH = "'1 can of chopped tomatoes' best matches results from 'Tomato, peeled, canned'."
 DK_EXAMPLE_MATCH = "'1 dåse hakkede tomater' best matches results from 'Tomat, flået, konserves'."
 
-EN_EXAMPLE_ANSWER_FOUND = "'Chopped tomatoes: X kg CO2e / kg \n'"
-DK_EXAMPLE_ANSWER_FOUND = "'Hakkede tomater: X kg CO2e/ kg \n'."
+# EN_EXAMPLE_ANSWER_FOUND = "'Chopped tomatoes: X kg CO2e / kg \n'"
+# DK_EXAMPLE_ANSWER_FOUND = "'Hakkede tomater: X kg CO2e/ kg \n'."
 
-EN_EXAMPLE_ANSWER_NOT_FOUND = "'Chopped tomatoes: ? \n'"
-DK_EXAMPLE_ANSWER_NOT_FOUND = "'Hakkede tomater: ? \n'."
+# EN_EXAMPLE_ANSWER_NOT_FOUND = "'Chopped tomatoes: ? \n'"
+# DK_EXAMPLE_ANSWER_NOT_FOUND = "'Hakkede tomater: ? \n'."
 
 EN_INGREDIENTS_EXAMPLE = """
 150 g red lentils
@@ -89,88 +92,112 @@ EN_FINAL_ANSWER_EXAMPLE = """
 {
   "emissions": [
     {
-      "ingredient": "Red lentils",
-      "co2_per_kg": "1.78 kg CO2e / kg",
-      "comment": ""
+      "ingredient": "150 g red lentils",
+      "comment": "",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.78
     },
     {
-      "ingredient": "Chopped tomatoes",
-      "co2_per_kg": "1.26 kg CO2e / kg",
-      "comment": ""
+      "ingredient": "1 can of chopped tomatoes",
+      "comment": "",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.26
     },
     {
-      "ingredient": "Vegetable bouillon",
-      "co2_per_kg": "0.38 kg CO2e / kg",
-      "comment": "closest was chicken bouillon"
+      "ingredient": "2 cubes of vegetable bouillon",
+      "comment": "closest was chicken bouillon",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 0.38
     },
     {
-      "ingredient": "Tomato concentrate (140 g)",
-      "co2_per_kg": "2.48 kg CO2e / kg",
-      "comment": "closest was tomato paste"
+      "ingredient": "1 tin of tomato concentrate (140 g)",
+      "comment": "closest was tomato paste",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 2.48
     },
     {
-      "ingredient": "Lemon juice",
-      "co2_per_kg": "0.94 kg CO2e / kg",
-      "comment": "Closest was Lemon, raw"
+      "ingredient": "1 tbsp. lemon juice",
+      "comment": "Closest was Lemon, raw",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 0.94
     },
     {
-      "ingredient": "Starfruit",
-      "co2_per_kg": "?",
-      "comment": "Not found in database"
+      "ingredient": "1. tbsp. chili powder",
+      "comment": "closest was 'Pepper, hot chili, canned'",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.54
+    },
+    {
+      "ingredient": "1 starfruit",
+      "comment": "Not found in database",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": null
     }
   ]
 }
-
 """
 
 DK_FINAL_ANSWER_EXAMPLE = """
 {
   "emissions": [
     {
-      "ingredient": "Red lentils",
-      "co2_per_kg": "1.78 kg CO2e / kg",
-      "comment": ""
+      "ingredient": "150 g røde linser",
+      "comment": "",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.78
     },
     {
-      "ingredient": "Chopped tomatoes",
-      "co2_per_kg": "1.26 kg CO2e / kg",
-      "comment": ""
+      "ingredient": "1 dåse hakkede tomater",
+      "comment": "",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.26
     },
     {
-      "ingredient": "Vegetable bouillon",
-      "co2_per_kg": "0.38 kg CO2e / kg",
-      "comment": "closest was chicken bouillon"
+      "ingredient": "2 terninger grøntsagsbouillon",
+      "comment": "tættest var Bouillon, hønsekød, spiseklar",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 0.38
     },
     {
-      "ingredient": "Tomato concentrate",
-      "co2_per_kg": "2.48 kg CO2e / kg",
-      "comment": "closest was tomato paste"
+      "ingredient": "1 dåse tomatkoncentrat (140 g)",
+      "comment": "tættest var tomatpure, koncentreret",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 2.48
     },
     {
-      "ingredient": "Lemon juice",
-      "co2_per_kg": "0.94 kg CO2e / kg",
-      "comment": "Closest was Lemon, raw"
+      "ingredient": "1 spsk. citronsaft",
+      "comment": "Tættest var citron, rå",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 0.94
     },
     {
-      "ingredient": "Corn tortillas",
-      "co2_per_kg": "0.74 kg CO2e / kg",
-      "comment": "Closest was Wheat Tortilla, hvede"
+      "ingredient": "1. spsk. chilipulver",
+      "comment": "tættest var Peber, chili, konserves",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.54
     },
     {
-      "ingredient": "Starfruit",
-      "co2_per_kg": "?",
-      "comment": "Not found in database"
+      "ingredient": "10 majstortillas",
+      "comment": "Tættest var tortillabrød, hvede",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 0.74
+    },
+    {
+      "ingredient": "1 stjernefrugt",
+      "comment": "Ikke fundet i databasen",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": null
     }
   ]
 }
-
 """
 
 
 class CO2perKg(BaseModel):
     ingredient: str = Field(description="Name of ingredient")
-    co2_per_kg: str = Field(description="kg CO2 per kg for ingredient. '?' if result not found")
     comment: str = Field(description="Comment about result. For instance what closest result is.")
+    unit: str = Field(description="The unit which is kg CO2e per kg")
+    co2_per_kg: Optional[float] = Field(description="kg CO2 per kg for ingredient", default=None)
 
 
 class CO2Emissions(BaseModel):
@@ -181,7 +208,7 @@ co2_output_parser = PydanticOutputParser(pydantic_object=CO2Emissions)
 
 
 CO2_SQL_PROMPT_TEMPLATE = """
-Given a list of ingredients in Danish, extract the main ingredients from the list
+Given a list of ingredients in {language}, extract the main ingredients from the list
 and create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
 
 Solve the task using the following steps:
@@ -191,10 +218,7 @@ Solve the task using the following steps:
   Example of removing: {example_removing}
 - Match the SQLResult to the list of ingredients based on preparation and type.
   Example match: {example_match}
-- Return the Answer in the following format: ''ingredient': X kg CO2e / kg'.
-  Example Answer: {example_answer}
-- If the ingredient is not found in the database, return '?'.
-  Example Answer: {example_not_found}
+- Return the Answer by the format instructions explained below. 
 - Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer.
   Instead, return the closest match.
 
@@ -225,11 +249,12 @@ EN_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
     template=CO2_SQL_PROMPT_TEMPLATE,
     input_variables=["dialect", "table_info", "input"],
     partial_variables={
+        "language": EN_LANGUAGE,
         "example_query": EN_SQL_QUERY_EXAMPLE,
         "example_removing": EN_EXAMPLE_REMOVING,
         "example_match": EN_EXAMPLE_MATCH,
-        "example_answer": EN_EXAMPLE_ANSWER_FOUND,
-        "example_not_found": EN_EXAMPLE_ANSWER_NOT_FOUND,
+        # "example_answer": EN_EXAMPLE_ANSWER_FOUND,
+        # "example_not_found": EN_EXAMPLE_ANSWER_NOT_FOUND,
         "ingredients_example": EN_INGREDIENTS_EXAMPLE,
         "query_example": EN_SQL_QUERY_EXAMPLE,
         "query_result_example": EN_SQL_RESULT_EXAMPLE,
@@ -242,11 +267,12 @@ DK_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
     template=CO2_SQL_PROMPT_TEMPLATE,
     input_variables=["dialect", "table_info", "input"],
     partial_variables={
+        "language": DK_LANGUAGE,
         "example_query": DK_SQL_QUERY_EXAMPLE,
         "example_removing": DK_EXAMPLE_REMOVING,
         "example_match": DK_EXAMPLE_MATCH,
-        "example_answer": DK_EXAMPLE_ANSWER_FOUND,
-        "example_not_found": DK_EXAMPLE_ANSWER_NOT_FOUND,
+        # "example_answer": DK_EXAMPLE_ANSWER_FOUND,
+        # "example_not_found": DK_EXAMPLE_ANSWER_NOT_FOUND,
         "ingredients_example": DK_INGREDIENTS_EXAMPLE,
         "query_example": DK_SQL_QUERY_EXAMPLE,
         "query_result_example": DK_SQL_RESULT_EXAMPLE,

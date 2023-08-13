@@ -1,4 +1,24 @@
-SEARCH_AGENT_PREFIX = """
+from typing import Optional
+
+from langchain.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
+
+
+# Not able to incorporate at the moment
+class CO2SearchResult(BaseModel):
+    ingredient: str = Field("The original input string with amounts etc. provided in 'Input:'")
+    explanation: str = Field(description="Explanation of how the final search result is chosen in step-by-step logic")
+    unit: Optional[str] = Field(description="Unit of search result.", default=None)
+    result: Optional[float] = Field(
+        description="Result in kg CO2e per kg. null/None if no useable result is found",
+        default=None,
+    )
+
+
+search_output_parser = PydanticOutputParser(pydantic_object=CO2SearchResult)
+
+
+SEARCH_AGENT_PROMPT_PREFIX = """
 Given an ingredient in Danish or English as input, find the kg CO2e per kg of the ingredient by using a search tool and extracting the kg CO2e per kg from the search results.
 
 If you find multiple values then choose the most likely result based on what type of ingredient it is.
@@ -16,18 +36,48 @@ Here is some information to help you choose the most likely result:
 If you can't estimate what value that is most likely, then provide the value closest to the median of the values.
 If you cannot find the kg CO2e per kg of the ingredient, then provide the final answer 'CO2e per kg not found'.
 
-You have access to the following tools:"""
+You have access to the following tools:
+"""
 
-SEARCH_AGENT_SUFFIX = """
+# SEARCH_AGENT_FORMAT_INSTRUCTIONS = """
+# Use the following format:
 
-You must search for '{input} kg CO2e per kg' and extract the kg CO2e per kg from the search results.
-Before providing the final answer, explain in a though how you arrived at the answer step by step.
-Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer.
+# Input: the ingredient you must search for
+# Thought: you should always think about what to do
+# Action: the action to take, should be one of [{tool_names}]
+# Action Input: the input to the action
+# Observation: the result of the action
+# ... (this Thought/Action/Action Input/Observation can repeat 1 time)
+# Thought: I now know the final answer
+# Final Answer: the final answer to the original input question.
+# """
+SEARCH_AGENT_FORMAT_INSTRUCTIONS = """
+Use the following format:
 
-Use the following template for the "Final Answer":
-'{input}: X kg CO2e per kg' OR '{input}: CO2e per kg not found'
+Input: the ingredient you must search for
+Action: the action to take, can only be {tool_names}
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat 1 time)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question.
+"""
+
+SEARCH_AGENT_PROMPT_SUFFIX = """
+
+Before searching for the ingredient, remove amounts and anything else that is not useful in getting kg CO2e per kg results.
+You do NOT need to use a tool for removing amount etc.
+Search on the language provided.
+
+Removal example: 150 g red lentils --> red lentils.
+Search example: red lentils kg CO2e per kg.
+
+You must extract the kg CO2e per kg from the search results.
+Do not provide any ranges for the final search result. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final search result.
+Remember the "ingredient" key must be the original input: '{input}'.
 
 Begin!
 
-Question: {input}
-Thought: {agent_scratchpad}"""
+Input: {input}
+{agent_scratchpad}
+"""

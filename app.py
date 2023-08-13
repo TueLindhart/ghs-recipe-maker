@@ -19,7 +19,7 @@ async def calculate():
         return "No URL provided"
 
     try:
-        result = await async_estimator(url, verbose=False)  # This assumes estimator is also async
+        result = await async_estimator(url, verbose=True)  # This assumes estimator is also async
     except Exception as exc_info:
         print(str(exc_info))
         result = "Something went wrong. :-( Please try again."

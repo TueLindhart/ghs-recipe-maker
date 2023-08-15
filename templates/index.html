@@ -8,14 +8,42 @@
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <style>
+      body {
+        background-color: rgba(
+          211,
+          255,
+          211,
+          0.3
+        ); /* Lighter transparent green background */
+      }
+
       /* Add styling for the result box */
       #resultDiv {
-        border: 1px solid #ccc;
+        border: 2px solid darkgreen; /* dark green border */
         background-color: #f8f8f8;
         padding: 10px;
         margin-top: 10px;
         min-height: 300px;
         white-space: pre-wrap; /* This will allow us to use \n as line break */
+        border-radius: 0px; /* No rounded corners */
+      }
+
+      /* Dark green button with sharp edges */
+      #calculateButton {
+        background-color: darkgreen;
+        border-color: darkgreen;
+        border-radius: 0px;
+      }
+
+      /* Hover effect for the button */
+      #calculateButton:hover {
+        background-color: #006400; /* A bit darker on hover */
+      }
+
+      /* Dark green border for the text input */
+      #urlInput {
+        border: 2px solid darkgreen;
+        border-radius: 0px; /* No rounded corners */
       }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -67,8 +95,11 @@
         currentFactIndex = 0; // Ensure starting from the beginning
         const funFactInterval = setInterval(() => {
           console.log("Setting fun fact."); // Debugging purpose
+
+          // Randomly choose a fact index
+          currentFactIndex = Math.floor(Math.random() * funFacts.length);
+
           resultDiv.innerHTML = `Still working on it ... BUT did you know that GPT4 says that ${funFacts[currentFactIndex]}`;
-          currentFactIndex = (currentFactIndex + 1) % funFacts.length;
         }, 15000);
 
         try {
@@ -111,7 +142,7 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-6 offset-md-3">
-          <h1 class="text-center mb-4">Recipe CO2 Emission Calculator</h1>
+          <h1 class="text-center mb-4">Recipe CO2e Emission Calculator</h1>
           <form>
             <div class="form-group">
               <label for="urlInput"
@@ -136,5 +167,6 @@
         </div>
       </div>
     </div>
+    <!-- Scripts for the functionalities go here... -->
   </body>
 </html>

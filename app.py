@@ -50,10 +50,10 @@ async def calculate():
 async def get_results(hashed_url):
     result = results.get(hashed_url, None)
     if result:
-        return jsonify(status="Completed", result=result)  # Return as a JSON object
+        return jsonify(status="Completed", result=result), 200  # Return as a JSON object
     else:
         return jsonify(status="Processing", url=hashed_url), 202  # Maintain consistency with a JSON response
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

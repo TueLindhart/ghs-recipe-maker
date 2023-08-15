@@ -2,49 +2,19 @@
 <html>
   <head>
     <title>Recipe CO2 Emission Calculator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
     <style>
-      /* Create a CSS spinner */
-      .spinner {
-        border: 8px solid #f3f3f3; /* Half the previous size */
-        border-top: 8px solid #3498db; /* Half the previous size */
-        border-radius: 50%;
-        width: 60px; /* Half the previous size */
-        height: 60px; /* Half the previous size */
-        animation: spin 2s linear infinite;
-        visibility: hidden; /* The spinner should be hidden initially */
-        position: fixed; /* Make the spinner hover over content */
-        left: 50%; /* Center the spinner horizontally */
-        top: 50%; /* Center the spinner vertically */
-        transform: translate(-50%, -50%); /* Correct the spinner position */
-        z-index: 1000; /* Make sure the spinner is above all other content */
-      }
-
-      /* Add a background behind the spinner */
-      #spinnerBackground {
-        position: fixed; /* Cover the whole viewport */
-        top: 0; /* Cover the whole viewport */
-        bottom: 0; /* Cover the whole viewport */
-        left: 0; /* Cover the whole viewport */
-        right: 0; /* Cover the whole viewport */
-        background-color: #000;
-        opacity: 0.5;
-        visibility: hidden;
-        z-index: 999; /* Make sure the background is below the spinner */
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
       /* Add styling for the result box */
       #resultDiv {
         border: 1px solid #ccc;
         background-color: #f8f8f8;
-        padding: 15px;
-        margin-top: 15px;
+        padding: 10px;
+        margin-top: 10px;
+        min-height: 300px;
         white-space: pre-wrap; /* This will allow us to use \n as line break */
       }
     </style>
@@ -54,92 +24,113 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 
     <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const calculateButton = document.getElementById("calculateButton");
+        calculateButton.addEventListener("click", calculateCO2);
+      });
       const funFacts = [
-      "approximately one-third of all food produced globally goes to waste, often because it's deemed 'unattractive' for sale. By purchasing and consuming 'ugly' fruits and vegetables, we can help reduce food waste.",
-      "insects like crickets, mealworms, and locusts are rich in protein, vitamins, and minerals. They require significantly less land, water, and feed compared to traditional livestock, making them a sustainable source of nutrition.",
-      "plant-based burgers, like those from Beyond Meat or Impossible Foods, produce approximately 90% fewer greenhouse gas emissions and use 46% less energy compared to beef burgers.",
-      "used coffee grounds can be repurposed as a natural fertilizer, insect repellent, and even a skin exfoliant. They're a sustainable way to reuse waste from your morning cup!",
-      "grains like quinoa, amaranth, and millet are drought-tolerant and nutrient-rich, making them sustainable choices in regions with water scarcity.",
-      "regenerative agriculture focuses on restoring soil health, increasing biodiversity, and enhancing ecosystems. It can even capture more carbon dioxide than it emits, helping to combat climate change.",
-      "vertical farming involves growing crops in stacked layers, often in controlled indoor environments. It can reduce the need for pesticides, save space, and provide fresh produce in urban areas.",
-      "overfishing is a significant concern for ocean ecosystems. Organizations like the Monterey Bay Aquarium's Seafood Watch provide guidelines for consumers to select sustainably-sourced seafood.",
-      "some companies are now using mycelium, the root system of mushrooms, to create sustainable packaging materials. They're biodegradable, compostable, and an eco-friendly alternative to plastic.",
-      "natural cork, used in wine bottles, is harvested from the bark of the cork oak tree without cutting the tree down. Harvesting cork can actually benefit the tree's health and lifespan, making it a sustainable choice for sealing wines."
-    ];
+        "approximately one-third of all food produced worldwide goes to waste, often due to being perceived as 'unattractive'. By choosing and consuming 'ugly' fruits and vegetables, we can contribute to reducing food waste.",
+        "certain insects such as crickets, mealworms, and locusts are packed with protein, vitamins, and minerals. They require considerably less land, water, and feed compared to conventional livestock, making them an eco-friendly food source.",
+        "plant-based burgers can generate around 90% fewer greenhouse gas emissions and consume 46% less energy than beef burgers.",
+        "used coffee grounds have multiple purposes, such as a natural fertilizer, bug repellent, and even a skin exfoliant, showcasing a sustainable approach to reusing waste.",
+        "grains like quinoa, amaranth, and millet thrive in drought conditions and are packed with nutrients. These qualities make them excellent choices in areas facing water scarcity.",
+        "regenerative agriculture emphasizes soil health restoration, biodiversity enhancement, and ecosystem improvement. Remarkably, it can sequester more carbon dioxide than it releases, contributing to the fight against climate change.",
+        "vertical farming is an innovative method of growing crops in layered arrangements, often indoors. This technique can minimize the use of pesticides, conserve space, and provide urban regions with fresh produce.",
+        "the peril of overfishing threatens our marine ecosystems. Thankfully, there are guidelines available for consumers to help them choose seafood that's been harvested sustainably.",
+        "mycelium, which forms the underground network for mushrooms, is being utilized to produce sustainable packaging materials. These are biodegradable, compostable, and a great alternative to plastic.",
+        "chocolate, in its raw form, was once used as a form of currency by the ancient Mayans and Aztecs.",
+        "the fermentation process involved in producing beer releases CO2, and some breweries are now capturing and reusing that CO2 for various purposes.",
+        "while onions are known for making people cry, they can also be used to absorb smells, and placing an onion half in your basement can improve air quality.",
+        "greenhouse gas emissions from the dairy sector represent approximately 3% of total global emissions.",
+        "broccoli contains more protein per calorie than steak, although you would need to eat a lot more broccoli to get the same amount of protein.",
+        "wombat poop is cube-shaped, which helps prevent it from rolling away and marks its territory.",
+        "a group of flamingos is called a 'flamboyance'.",
+        "honeybees can recognize human faces.",
+      ];
       let currentFactIndex = 0;
 
       function hash_url(url) {
         return CryptoJS.MD5(url).toString();
-    }
+      }
 
       async function calculateCO2() {
-        const urlInput = document.getElementById('urlInput');
-        const resultDiv = document.getElementById('resultDiv');
-        const spinner = document.getElementById('spinner');
-        const spinnerBackground = document.getElementById('spinnerBackground');
+        const calculateButton = document.getElementById("calculateButton");
+        calculateButton.disabled = true;
+        const urlInput = document.getElementById("urlInput");
+        const resultDiv = document.getElementById("resultDiv");
         const url = urlInput.value;
 
-        // Clear resultDiv and display loading message and spinner
-        resultDiv.innerHTML = 'Calculating CO2 Emission (will take a minute or two) ...';
-        spinner.style.visibility = 'visible';
-        spinnerBackground.style.visibility = 'visible';
+        // Clear resultDiv and display loading message
+        resultDiv.innerHTML =
+          "Calculating CO2 Emission (will take a minute or two) ...";
 
-        // Start showing fun facts every 30 seconds
+        currentFactIndex = 0; // Ensure starting from the beginning
         const funFactInterval = setInterval(() => {
-            resultDiv.textContent = `Still working ... but did you know that ${funFacts[currentFactIndex]}`;
-            currentFactIndex = (currentFactIndex + 1) % funFacts.length;
-        }, 30000);
+          console.log("Setting fun fact."); // Debugging purpose
+          resultDiv.innerHTML = `Still working on it ... BUT did you know that GPT4 says that ${funFacts[currentFactIndex]}`;
+          currentFactIndex = (currentFactIndex + 1) % funFacts.length;
+        }, 15000);
 
-        // Make request to start calculation
         try {
-            const response = await fetch(`/calculate?url=${url}`);
-            if (response.status === 202) {
-                const urlHash = hash_url(url);
-                pollForResult(urlHash, resultDiv, funFactInterval, spinner, spinnerBackground);
-            } else {
-                resultDiv.textContent = 'Error starting estimation';
-            }
+          const response = await fetch(`/calculate?url=${url}`);
+          if (response.status === 202) {
+            const urlHash = hash_url(url);
+            pollForResult(urlHash, resultDiv, funFactInterval);
+          } else {
+            resultDiv.textContent = "Error starting estimation";
+            calculateButton.disabled = false;
+          }
         } catch (error) {
-            resultDiv.textContent = `An error occurred: ${error.message}`;
+          resultDiv.textContent = `An error occurred: ${error.message}`;
+          calculateButton.disabled = false;
         }
-    }
+      }
 
-    async function pollForResult(urlHash, resultDiv, funFactInterval, spinner, spinnerBackground) {
+      async function pollForResult(urlHash, resultDiv, funFactInterval) {
         try {
-            const response = await fetch(`/results/${urlHash}`);
-            const data = await response.json();
-            if (response.status === 202 && data.status === 'Processing') {
-                setTimeout(() => {
-                    pollForResult(urlHash, resultDiv, funFactInterval, spinner, spinnerBackground);
-                }, 2000); // 2 seconds
-            } else {
-                // Display result
-                resultDiv.textContent = data.result;
-            }
+          const response = await fetch(`/results/${urlHash}`);
+          const data = await response.json();
+          if (response.status === 202 && data.status === "Processing") {
+            setTimeout(() => {
+              pollForResult(urlHash, resultDiv, funFactInterval);
+            }, 2000); // 2 seconds
+          } else {
+            clearInterval(funFactInterval); // Ensure the interval is cleared
+            resultDiv.textContent = data.result;
+            calculateButton.disabled = false;
+          }
         } catch (error) {
-            resultDiv.textContent = `An error occurred: ${error.message}`;
-        } finally {
-            // Stop showing fun facts and hide spinner
-            clearInterval(funFactInterval);
-            spinner.style.visibility = 'hidden';
-            spinnerBackground.style.visibility = 'hidden';
+          clearInterval(funFactInterval); // Ensure the interval is cleared in case of error
+          resultDiv.textContent = `An error occurred: ${error.message}`;
+          calculateButton.disabled = false;
         }
-    }
+      }
     </script>
   </head>
   <body>
-    <div id="spinnerBackground"></div>
-    <div id="spinner" class="spinner"></div>
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-6 offset-md-3">
           <h1 class="text-center mb-4">Recipe CO2 Emission Calculator</h1>
           <form>
             <div class="form-group">
-              <label for="urlInput">Enter recipe URL or the ingredients manually:</label>
-              <input type="text" class="form-control" id="urlInput" name="urlInput">
+              <label for="urlInput"
+                >Enter recipe URL or the ingredients manually:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="urlInput"
+                name="urlInput"
+              />
             </div>
-            <button type="button" class="btn btn-primary btn-block" onclick="calculateCO2()">Calculate CO2 Emission</button>
+            <button
+              type="button"
+              id="calculateButton"
+              class="btn btn-primary btn-block"
+            >
+              Calculate CO2e Emission
+            </button>
           </form>
           <div id="resultDiv" class="mt-4"></div>
         </div>

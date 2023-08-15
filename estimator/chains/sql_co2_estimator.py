@@ -5,7 +5,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.sql_database import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
 
-from estimator.prompt_templates.co2_sql_prompts import (
+from estimator.prompt_templates.sql_co2_estimator import (
     DK_CO2_SQL_PROMPT_TEMPLATE,
     EN_CO2_SQL_PROMPT_TEMPLATE,
 )

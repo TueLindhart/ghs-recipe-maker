@@ -1,23 +1,3 @@
-from typing import Optional
-
-from langchain.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field
-
-
-# Not able to incorporate at the moment
-class CO2SearchResult(BaseModel):
-    ingredient: str = Field("The original input string with amounts etc. provided in 'Input:'")
-    explanation: str = Field(description="Explanation of how the final search result is chosen in step-by-step logic")
-    unit: Optional[str] = Field(description="Unit of search result.", default=None)
-    result: Optional[float] = Field(
-        description="Result in kg CO2e per kg. null/None if no useable result is found",
-        default=None,
-    )
-
-
-search_output_parser = PydanticOutputParser(pydantic_object=CO2SearchResult)
-
-
 SEARCH_AGENT_PROMPT_PREFIX = """
 Given an ingredient in Danish or English as input, find the kg CO2e per kg of the ingredient by using a search tool and extracting the kg CO2e per kg from the search results.
 

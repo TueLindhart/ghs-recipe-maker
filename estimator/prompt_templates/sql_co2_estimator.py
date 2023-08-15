@@ -1,16 +1,20 @@
-from typing import List, Optional
-
 from langchain import PromptTemplate
-from langchain.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field
+
+from estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
 
 EN_LANGUAGE = "English"
 DK_LANGUAGE = "Danish"
 
-EN_EXAMPLE_QUERY = "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
-DK_EXAMPLE_QUERY = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
+EN_EXAMPLE_QUERY = (
+    "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
+)
+DK_EXAMPLE_QUERY = (
+    "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
+)
 
-EN_EXAMPLE_REMOVING = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomato%' OR Navn LIKE '%bouillion%'"
+EN_EXAMPLE_REMOVING = (
+    "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomato%' OR Navn LIKE '%bouillion%'"
+)
 DK_EXAMPLE_REMOVING = "'%hakkede tomater%' to '%tomat%' or '%hakket oksekød%' to '%oksekød%'"
 
 EN_EXAMPLE_MATCH = "'1 can of chopped tomatoes' best matches results from 'Tomato, peeled, canned'."
@@ -193,32 +197,18 @@ DK_FINAL_ANSWER_EXAMPLE = """
 """
 
 
-class CO2perKg(BaseModel):
-    ingredient: str = Field(description="Name of ingredient")
-    comment: str = Field(description="Comment about result. For instance what closest result is.")
-    unit: str = Field(description="The unit which is kg CO2e per kg")
-    co2_per_kg: Optional[float] = Field(description="kg CO2 per kg for ingredient", default=None)
-
-
-class CO2Emissions(BaseModel):
-    emissions: List[CO2perKg]
-
-
-co2_output_parser = PydanticOutputParser(pydantic_object=CO2Emissions)
-
-
 CO2_SQL_PROMPT_TEMPLATE = """
 Given a list of ingredients in {language}, extract the main ingredients from the list
 and create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
 
 Solve the task using the following steps:
-- Query all ingredients in a single query.
+- Query all ingredients in a single query. Make sure you query ALL the ingredients provided after `Ingredients:`
   Example query: {example_query}
 - In the query, remove all non-ingredient words.
   Example of removing: {example_removing}
 - Match the SQLResult to the list of ingredients based on preparation and type.
   Example match: {example_match}
-- Return the Answer by the format instructions explained below. 
+- Return the Answer by the format instructions explained below.
 - Do not provide any ranges for the final answer. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final answer.
   Instead, return the closest match.
 
@@ -258,7 +248,7 @@ EN_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "ingredients_example": EN_INGREDIENTS_EXAMPLE,
         "query_example": EN_SQL_QUERY_EXAMPLE,
         "query_result_example": EN_SQL_RESULT_EXAMPLE,
-        "format_instructions": co2_output_parser.get_format_instructions(),
+        "format_instructions": sql_co2_output_parser.get_format_instructions(),
         "final_answer_example": EN_FINAL_ANSWER_EXAMPLE,
     },
 )
@@ -276,7 +266,7 @@ DK_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "ingredients_example": DK_INGREDIENTS_EXAMPLE,
         "query_example": DK_SQL_QUERY_EXAMPLE,
         "query_result_example": DK_SQL_RESULT_EXAMPLE,
-        "format_instructions": co2_output_parser.get_format_instructions(),
+        "format_instructions": sql_co2_output_parser.get_format_instructions(),
         "final_answer_example": DK_FINAL_ANSWER_EXAMPLE,
     },
 )

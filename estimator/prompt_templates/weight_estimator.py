@@ -1,8 +1,6 @@
-from typing import List, Optional
-
 from langchain import PromptTemplate
-from langchain.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field
+
+from estimator.output_parsers.weight_estimator import weight_output_parser
 
 EN_WEIGHT_RECALCULATIONS = """
 1 can = 400 g = 0.4 kg
@@ -20,6 +18,7 @@ EN_WEIGHT_RECALCULATIONS = """
 1 tortilla = 30 g = 0.030 kg
 1 squash = 400 g = 0.400 kg
 1 clove garlic = 0.004 kg
+1 dl / deciliter = 0.1 kg
 Handful of herbs (basil, oregano etc.) = 0.025 kg
 
 Examples of a bunch/bnch of an ingredient - use them as a guideline:
@@ -46,6 +45,7 @@ DK_WEIGHT_RECALCULATIONS = """
 1 tortilla = 30 g = 0.030 kg
 1 squash = 400 g = 0.400 kg
 1 fed hvidløg = 0.004 kg
+1 dl / deciliter = 0.1 kg
 Håndful urter (basilikum, oregano osv.) = 0.025 kg
 
 Examples of bdt/bundt af en ingrediens - use them as a guideline:
@@ -221,6 +221,7 @@ The following general weights can be used for estimation:
 
 If an ingredient is not found in the list of general weights, try to give your best estimate
 of the weight in kilogram/kg of the ingredient and say (estimated by LLM model).
+Your estimate must always be a python float. Therefore, you must not provide any intervals.
 
 Input is given after "Ingredients:"
 
@@ -235,19 +236,6 @@ Answer:
 Ingredients:
 {input}
 """
-
-
-class WeightEstimate(BaseModel):
-    ingredient: str = Field(description="Ingredient as called in ingredient list")
-    weight_calculation: str = Field(description="Description of how weights are estimated")
-    weight_in_kg: Optional[float] = Field(description="Weight provided in kg", default=None)
-
-
-class WeightEstimates(BaseModel):
-    weight_estimates: List[WeightEstimate] = Field(description="List of 'WeightEstimate' per ingredient.")
-
-
-weight_output_parser = PydanticOutputParser(pydantic_object=WeightEstimates)
 
 
 DK_WEIGHT_EST_PROMPT = PromptTemplate(

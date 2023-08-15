@@ -11,5 +11,8 @@
     },
     "flake8.args": [
         "--config=.flake8"
-    ]
+    ],
+    "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

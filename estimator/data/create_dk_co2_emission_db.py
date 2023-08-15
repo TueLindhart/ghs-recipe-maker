@@ -18,7 +18,7 @@ df = df.rename(
     }
 )
 df["Total_kg_CO2_eq_kg"] = df["Total_kg_CO2_eq_kg"].round(2)
-df = df.loc[~df["Name"].str.contains("Pizza")]  # remove pizza
+df = df.loc[~df["Name"].str.contains("|".join(["Pizza", "Lasagne"]))]  # remove pizza
 
 conn = sqlite3.connect(f"{os.getcwd()}/estimator/data/dk_co2_emission.db")
 

@@ -5,20 +5,20 @@ from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 
-from estimator.prompt_templates.co2_search_prompts import (
+from estimator.output_parsers.search_co2_estimator import search_co2_output_parser
+from estimator.prompt_templates.search_co2_estimator import (
     SEARCH_AGENT_FORMAT_INSTRUCTIONS,
     SEARCH_AGENT_PROMPT_PREFIX,
     SEARCH_AGENT_PROMPT_SUFFIX,
-    search_output_parser,
 )
 
 
 def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["google", "serper"] = "serper"):
     if search_type == "google":
-        search_chain = GoogleSearchAPIWrapper(k=20, search_engine="google")
+        search_chain = GoogleSearchAPIWrapper(k=10, search_engine="google")
         coroutine = None
     else:
-        search_chain = GoogleSerperAPIWrapper(k=20, gl="dk")
+        search_chain = GoogleSerperAPIWrapper(k=10, gl="dk")
         coroutine = search_chain.arun
 
     tools = [
@@ -37,13 +37,21 @@ def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["goo
         tool_names=tool_names,
     )
     format_instructions2 = "{format_instructions}"
-    template = "\n\n".join([SEARCH_AGENT_PROMPT_PREFIX, tool_strings, format_instructions, format_instructions2, SEARCH_AGENT_PROMPT_SUFFIX])
+    template = "\n\n".join(
+        [
+            SEARCH_AGENT_PROMPT_PREFIX,
+            tool_strings,
+            format_instructions,
+            format_instructions2,
+            SEARCH_AGENT_PROMPT_SUFFIX,
+        ]
+    )
 
     prompt = PromptTemplate(
         template=template,
         input_variables=["input", "agent_scratchpad"],
-        output_parser=search_output_parser,
-        partial_variables={"format_instructions": search_output_parser.get_format_instructions()},
+        output_parser=search_co2_output_parser,
+        partial_variables={"format_instructions": search_co2_output_parser.get_format_instructions()},
     )
 
     llm_chain = LLMChain(

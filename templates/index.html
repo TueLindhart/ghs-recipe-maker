@@ -102,35 +102,54 @@
           resultDiv.innerHTML = `Still working on it ... BUT did you know that GPT4 says that ${funFacts[currentFactIndex]}`;
         }, 15000);
 
+        // Setting up a 3-minute timeout to check if processing takes too long
+        const maxProcessingTime = 180000; // 3 minutes in milliseconds
+
+        const timeoutID = setTimeout(() => {
+          clearInterval(funFactInterval);
+          resultDiv.textContent =
+            "Something went wrong :-( - ChatGPT is slow at the moment";
+          calculateButton.disabled = false;
+        }, maxProcessingTime);
+
         try {
           const response = await fetch(`/calculate?url=${url}`);
           if (response.status === 202) {
             const urlHash = hash_url(url);
-            pollForResult(urlHash, resultDiv, funFactInterval);
+            pollForResult(urlHash, resultDiv, funFactInterval, timeoutID);
           } else {
+            clearTimeout(timeoutID); // Clear the timeout if we have an error response
             resultDiv.textContent = "Error starting estimation";
             calculateButton.disabled = false;
           }
         } catch (error) {
+          clearTimeout(timeoutID); // Clear the timeout in case of an error
           resultDiv.textContent = `An error occurred: ${error.message}`;
           calculateButton.disabled = false;
         }
       }
 
-      async function pollForResult(urlHash, resultDiv, funFactInterval) {
+      async function pollForResult(
+        urlHash,
+        resultDiv,
+        funFactInterval,
+        timeoutID
+      ) {
         try {
           const response = await fetch(`/results/${urlHash}`);
           const data = await response.json();
           if (response.status === 202 && data.status === "Processing") {
             setTimeout(() => {
-              pollForResult(urlHash, resultDiv, funFactInterval);
+              pollForResult(urlHash, resultDiv, funFactInterval, timeoutID);
             }, 2000); // 2 seconds
           } else {
+            clearTimeout(timeoutID); // Clear the timeout if we have a result or error response
             clearInterval(funFactInterval); // Ensure the interval is cleared
             resultDiv.textContent = data.result;
             calculateButton.disabled = false;
           }
         } catch (error) {
+          clearTimeout(timeoutID); // Clear the timeout in case of an error
           clearInterval(funFactInterval); // Ensure the interval is cleared in case of error
           resultDiv.textContent = `An error occurred: ${error.message}`;
           calculateButton.disabled = false;

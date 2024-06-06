@@ -4,7 +4,7 @@ import threading
 
 from flask import Flask, jsonify, render_template, request
 
-from estimator import async_estimator
+from food_co2_estimator import async_estimator
 
 app = Flask(__name__)
 
@@ -50,9 +50,15 @@ async def calculate():
 async def get_results(hashed_url):
     result = results.get(hashed_url, None)
     if result:
-        return jsonify(status="Completed", result=result), 200  # Return as a JSON object
+        return (
+            jsonify(status="Completed", result=result),
+            200,
+        )  # Return as a JSON object
     else:
-        return jsonify(status="Processing", url=hashed_url), 202  # Maintain consistency with a JSON response
+        return (
+            jsonify(status="Processing", url=hashed_url),
+            202,
+        )  # Maintain consistency with a JSON response
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from food_co2_estimator.prompt_templates.sql_co2_estimator import (
 
 def get_co2_sql_chain(language: Literal["da", "en"], verbose: bool = False):
     sql_dk_co2_db = SQLDatabase.from_uri(
-        f"sqlite:///{os.getcwd()}/estimator/data/dk_co2_emission.db",
+        f"sqlite:///{os.getcwd()}/food_co2_estimator/data/dk_co2_emission.db",
         sample_rows_in_table_info=2,
     )
     llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")  # type: ignore

@@ -201,7 +201,7 @@ if __name__ == "__main__":
     end_time = time()
     print(f"Time elapsed: {end_time - start_time}s")
 
-    start_time = time()
-    print(asyncio.run(async_estimator(url=url, verbose=False)))
-    end_time = time()
-    print(f"Async time elapsed: {end_time - start_time}s")
+    # start_time = time()
+    # print(asyncio.run(async_estimator(url=url, verbose=False)))
+    # end_time = time()
+    # print(f"Async time elapsed: {end_time - start_time}s")

@@ -4,7 +4,7 @@ import sqlite3
 import pandas as pd
 
 df = pd.read_excel(
-    f"{os.getcwd()}/estimator/data/Results_FINAL_20210201v4.xlsx",
+    f"{os.getcwd()}/food_co2_estimator/data/Results_FINAL_20210201v4.xlsx",
     sheet_name="Ra_500food",
 )
 
@@ -20,7 +20,7 @@ df = df.rename(
 df["Total_kg_CO2_eq_kg"] = df["Total_kg_CO2_eq_kg"].round(2)
 df = df.loc[~df["Name"].str.contains("|".join(["Pizza", "Lasagne"]))]  # remove pizza
 
-conn = sqlite3.connect(f"{os.getcwd()}/estimator/data/dk_co2_emission.db")
+conn = sqlite3.connect(f"{os.getcwd()}/food_co2_estimator/data/dk_co2_emission.db")
 
 FIELDS = ["Name", "Navn", "Unit", "Total_kg_CO2_eq_kg", "Energy"]
 # create database from df file

@@ -19,6 +19,8 @@ def generate_output(
             "not_found": "CO2e per kg not found",
             "total": "Total CO2 emission",
             "total_weight": "Total Weight",
+            "emission_pr_kg": "Emission pr. kg.",
+            "avg_meal_emission_pr_kg": "Avg. meal",
             "method": "The calculation method per ingredient is",
             "legends": "Legends",
             "db": "(DB) - Data from SQL Database (https://denstoreklimadatabase.dk)",
@@ -32,6 +34,8 @@ def generate_output(
             "not_found": "CO2e per kg ikke fundet",
             "total": "Samlet CO2-udslip",
             "total_weight": "Samlet vægt",
+            "emission_pr_kg": "Emission pr. kg.",
+            "avg_meal_emission_pr_kg": "Avg. meal",
             "method": "Beregningsmetoden pr. ingrediens er",
             "legends": "Forklaring",
             "db": "(DB) - Data fra SQL Database (https://denstoreklimadatabase.dk)",
@@ -114,6 +118,8 @@ def generate_output(
         "----------------------------------------"
         f"\n{trans['total']}: {round(total_co2,2)} kg CO2e"
         f"\n{trans['total_weight']}: {round(total_weight,2)} kg"
+        f"\n{trans['emission_pr_kg']}: {round(total_co2/total_weight,2)} kg CO2e / kg"
+        f"\n{trans['avg_meal_emission_pr_kg']}: 2.54 kg CO2e / kg"
         "\n----------------------------------------"
         f"\n{trans['method']}: X kg * Y kg CO2e / kg = Z kg CO2e"
     )

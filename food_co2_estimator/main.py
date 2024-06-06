@@ -4,16 +4,18 @@ import validators
 from langchain.schema.output_parser import OutputParserException
 from langdetect import detect
 
-from estimator.agent.search_agent import get_co2_google_search_agent
-from estimator.chains.recipe_extractor import get_recipe_extractor_chain
-from estimator.chains.sql_co2_estimator import get_co2_sql_chain
-from estimator.chains.weight_estimator import get_weight_estimator_chain
-from estimator.output_parsers.retry_parser import get_retry_parser
-from estimator.output_parsers.search_co2_estimator import search_co2_output_parser
-from estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
-from estimator.output_parsers.weight_estimator import weight_output_parser
-from estimator.prompt_templates.recipe_extractor import recipe_output_parser
-from estimator.utils import generate_output, get_url_text
+from food_co2_estimator.agent.search_agent import get_co2_google_search_agent
+from food_co2_estimator.chains.recipe_extractor import get_recipe_extractor_chain
+from food_co2_estimator.chains.sql_co2_estimator import get_co2_sql_chain
+from food_co2_estimator.chains.weight_estimator import get_weight_estimator_chain
+from food_co2_estimator.output_parsers.retry_parser import get_retry_parser
+from food_co2_estimator.output_parsers.search_co2_estimator import (
+    search_co2_output_parser,
+)
+from food_co2_estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
+from food_co2_estimator.output_parsers.weight_estimator import weight_output_parser
+from food_co2_estimator.prompt_templates.recipe_extractor import recipe_output_parser
+from food_co2_estimator.utils import generate_output, get_url_text
 
 
 # TO-DO: Implement better coding practices (No Exception etc.)
@@ -42,7 +44,9 @@ def estimator(
 
     try:
         # Estimate weights using weight estimator
-        weight_estimator_chain = get_weight_estimator_chain(language=language, verbose=verbose)
+        weight_estimator_chain = get_weight_estimator_chain(
+            language=language, verbose=verbose
+        )
         weight_output = weight_estimator_chain.run(ingredients)
         parsed_weight_output = weight_output_parser.parse(weight_output)
     except Exception:
@@ -54,7 +58,8 @@ def estimator(
         co2_query_input = [
             item.ingredient
             for item in parsed_weight_output.weight_estimates
-            if item.weight_in_kg is not None and item.weight_in_kg > negligeble_threshold
+            if item.weight_in_kg is not None
+            and item.weight_in_kg > negligeble_threshold
         ]
         co2_query_input_str = str(co2_query_input)
         sql_output = co2_sql_chain.run(co2_query_input_str)
@@ -64,10 +69,16 @@ def estimator(
 
     # Check if any ingredients needs CO2 search
     try:
-        co2_search_input_items = [item.ingredient for item in parsed_sql_output.emissions if item.co2_per_kg is None]
+        co2_search_input_items = [
+            item.ingredient
+            for item in parsed_sql_output.emissions
+            if item.co2_per_kg is None
+        ]
         search_agent = get_co2_google_search_agent(verbose=verbose)
         search_results = [search_agent.run(item) for item in co2_search_input_items]
-        parsed_search_results = [search_co2_output_parser.parse(result) for result in search_results]
+        parsed_search_results = [
+            search_co2_output_parser.parse(result) for result in search_results
+        ]
     except Exception:
         print("Something went wrong when searching for kg CO2e per kg")
         parsed_search_results = []
@@ -111,7 +122,9 @@ async def async_estimator(
 
     try:
         # Estimate weights using weight estimator
-        weight_estimator_chain = get_weight_estimator_chain(language=language, verbose=verbose)
+        weight_estimator_chain = get_weight_estimator_chain(
+            language=language, verbose=verbose
+        )
         weight_output = await weight_estimator_chain.arun(ingredients)
         try:
             parsed_weight_output = weight_output_parser.parse(weight_output)
@@ -128,7 +141,8 @@ async def async_estimator(
         co2_query_input = [
             item.ingredient
             for item in parsed_weight_output.weight_estimates
-            if item.weight_in_kg is not None and item.weight_in_kg > negligeble_threshold
+            if item.weight_in_kg is not None
+            and item.weight_in_kg > negligeble_threshold
         ]
         co2_query_input_str = str(co2_query_input)
         sql_output = co2_sql_chain.run(
@@ -145,7 +159,11 @@ async def async_estimator(
 
     # Check if any ingredients needs CO2 search
     try:
-        co2_search_input_items = [item.ingredient for item in parsed_sql_output.emissions if item.co2_per_kg is None]
+        co2_search_input_items = [
+            item.ingredient
+            for item in parsed_sql_output.emissions
+            if item.co2_per_kg is None
+        ]
         search_agent = get_co2_google_search_agent(verbose=verbose)
         tasks = [search_agent.arun(q) for q in co2_search_input_items]
         search_results = await asyncio.gather(*tasks)

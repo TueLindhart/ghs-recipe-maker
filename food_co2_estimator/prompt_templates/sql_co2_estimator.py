@@ -1,24 +1,24 @@
 from langchain import PromptTemplate
 
-from estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
+from food_co2_estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
 
 EN_LANGUAGE = "English"
 DK_LANGUAGE = "Danish"
 
-EN_EXAMPLE_QUERY = (
-    "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
-)
-DK_EXAMPLE_QUERY = (
-    "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
+EN_EXAMPLE_QUERY = "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
+DK_EXAMPLE_QUERY = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
+
+EN_EXAMPLE_REMOVING = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomato%' OR Navn LIKE '%bouillion%'"
+DK_EXAMPLE_REMOVING = (
+    "'%hakkede tomater%' to '%tomat%' or '%hakket oksekød%' to '%oksekød%'"
 )
 
-EN_EXAMPLE_REMOVING = (
-    "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomato%' OR Navn LIKE '%bouillion%'"
+EN_EXAMPLE_MATCH = (
+    "'1 can of chopped tomatoes' best matches results from 'Tomato, peeled, canned'."
 )
-DK_EXAMPLE_REMOVING = "'%hakkede tomater%' to '%tomat%' or '%hakket oksekød%' to '%oksekød%'"
-
-EN_EXAMPLE_MATCH = "'1 can of chopped tomatoes' best matches results from 'Tomato, peeled, canned'."
-DK_EXAMPLE_MATCH = "'1 dåse hakkede tomater' best matches results from 'Tomat, flået, konserves'."
+DK_EXAMPLE_MATCH = (
+    "'1 dåse hakkede tomater' best matches results from 'Tomat, flået, konserves'."
+)
 
 # EN_EXAMPLE_ANSWER_FOUND = "'Chopped tomatoes: X kg CO2e / kg \n'"
 # DK_EXAMPLE_ANSWER_FOUND = "'Hakkede tomater: X kg CO2e/ kg \n'."

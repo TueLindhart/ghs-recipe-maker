@@ -5,15 +5,19 @@ from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 
-from estimator.output_parsers.search_co2_estimator import search_co2_output_parser
-from estimator.prompt_templates.search_co2_estimator import (
+from food_co2_estimator.output_parsers.search_co2_estimator import (
+    search_co2_output_parser,
+)
+from food_co2_estimator.prompt_templates.search_co2_estimator import (
     SEARCH_AGENT_FORMAT_INSTRUCTIONS,
     SEARCH_AGENT_PROMPT_PREFIX,
     SEARCH_AGENT_PROMPT_SUFFIX,
 )
 
 
-def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["google", "serper"] = "serper"):
+def get_co2_google_search_agent(
+    verbose: bool = False, search_type: Literal["google", "serper"] = "serper"
+):
     if search_type == "google":
         search_chain = GoogleSearchAPIWrapper(k=10, search_engine="google")
         coroutine = None
@@ -51,7 +55,9 @@ def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["goo
         template=template,
         input_variables=["input", "agent_scratchpad"],
         output_parser=search_co2_output_parser,
-        partial_variables={"format_instructions": search_co2_output_parser.get_format_instructions()},
+        partial_variables={
+            "format_instructions": search_co2_output_parser.get_format_instructions()
+        },
     )
 
     llm_chain = LLMChain(
@@ -61,7 +67,9 @@ def get_co2_google_search_agent(verbose: bool = False, search_type: Literal["goo
 
     tool_names = [tool.name for tool in tools]
     agent = ZeroShotAgent(llm_chain=llm_chain, allowed_tools=tool_names)
-    agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=verbose)
+    agent_executor = AgentExecutor.from_agent_and_tools(
+        agent=agent, tools=tools, verbose=verbose
+    )
 
     return agent_executor
 

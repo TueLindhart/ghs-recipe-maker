@@ -1,6 +1,6 @@
 from langchain import PromptTemplate
 
-from estimator.output_parsers.weight_estimator import weight_output_parser
+from food_co2_estimator.output_parsers.weight_estimator import weight_output_parser
 
 EN_WEIGHT_RECALCULATIONS = """
 1 can = 400 g = 0.4 kg

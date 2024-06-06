@@ -1,8 +1,8 @@
 from typing import List
 
-from estimator.output_parsers.search_co2_estimator import CO2SearchResult
-from estimator.output_parsers.sql_co2_estimator import CO2Emissions
-from estimator.output_parsers.weight_estimator import WeightEstimates
+from food_co2_estimator.output_parsers.search_co2_estimator import CO2SearchResult
+from food_co2_estimator.output_parsers.sql_co2_estimator import CO2Emissions
+from food_co2_estimator.output_parsers.weight_estimator import WeightEstimates
 
 
 def generate_output(
@@ -50,9 +50,21 @@ def generate_output(
 
     for weight_estimate in weight_estimates.weight_estimates:
         co2_data = next(
-            (item for item in co2_emissions.emissions if item.ingredient == weight_estimate.ingredient), None
+            (
+                item
+                for item in co2_emissions.emissions
+                if item.ingredient == weight_estimate.ingredient
+            ),
+            None,
         )
-        search_result = next((item for item in search_results if item.ingredient == weight_estimate.ingredient), None)
+        search_result = next(
+            (
+                item
+                for item in search_results
+                if item.ingredient == weight_estimate.ingredient
+            ),
+            None,
+        )
 
         comments = {
             "Weight": weight_estimate.weight_calculation,
@@ -60,13 +72,17 @@ def generate_output(
             "Search": search_result.explanation if search_result else None,
         }
 
-        all_comments.append({"ingredient": weight_estimate.ingredient, "comments": comments})
+        all_comments.append(
+            {"ingredient": weight_estimate.ingredient, "comments": comments}
+        )
 
         if weight_estimate.weight_in_kg is not None:
             total_weight += weight_estimate.weight_in_kg
 
         if weight_estimate.weight_in_kg is None:
-            ingredients_output.append(f"{weight_estimate.ingredient}: {trans['unable']}")
+            ingredients_output.append(
+                f"{weight_estimate.ingredient}: {trans['unable']}"
+            )
             continue
 
         if weight_estimate.weight_in_kg <= negligeble_threshold:
@@ -90,7 +106,9 @@ def generate_output(
             total_co2 += co2_value
 
         else:
-            ingredients_output.append(f"{weight_estimate.ingredient}: {trans['not_found']}")
+            ingredients_output.append(
+                f"{weight_estimate.ingredient}: {trans['not_found']}"
+            )
 
     output = (
         "----------------------------------------"

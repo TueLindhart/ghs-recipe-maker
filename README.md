@@ -1,1 +1,1 @@
-### Code for using LLMs to estiamte CO2 emission from recipe lists
+### Code for using LLMs to estimate CO2 emission from recipe lists

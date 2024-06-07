@@ -49,6 +49,12 @@ muskatnød 1 tsk peber 2 spsk olie 4 deciliter creme fraiche 18% 4 stk æggeblom
 500 gram torskefilet, 1 tsk havsalt, 2 stk æg, 1 stk gulerod, 0.5 deciliter fløde 13%, 0.5 tsk revet muskatnød, 1 tsk peber, 2 spsk olie, 4 deciliter creme fraiche 18%, 4 stk æggeblomme, 2 spsk frisk dild, 4 spsk frisk persille
 
 ####
+1 tomat2 løg200 g laks0.5 l mælk
+####
+
+1 tomat, 2 løg, 200 g laks, 0.5 l mælk
+
+####
 {input}
 ####
 """

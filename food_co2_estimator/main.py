@@ -115,10 +115,10 @@ async def async_estimator(
 
     # Detect language in ingredients
     language = detect(ingredients)
-    if language == "no":  # Easy mistake that should have any consequence
+    if language in ["no", "sv"]:  # Swedish and Norwegian is easy mistakes
         language = "da"
     if language != "en" and language != "da":
-        return "Language is not recognized as Danish, Norwegian or English"
+        return "Language is not recognized as Danish, Norwegian, Swedish or English"
 
     try:
         # Estimate weights using weight estimator
@@ -197,11 +197,15 @@ if __name__ == "__main__":
     start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
-    print(estimator(url, verbose=False))
-    end_time = time()
-    print(f"Time elapsed: {end_time - start_time}s")
-
-    # start_time = time()
-    # print(asyncio.run(async_estimator(url=url, verbose=False)))
+    url = """1 stk tomat
+             1 glas oliven
+             200 g løg
+          """
+    # print(estimator(url, verbose=False))
     # end_time = time()
-    # print(f"Async time elapsed: {end_time - start_time}s")
+    # print(f"Time elapsed: {end_time - start_time}s")
+
+    start_time = time()
+    print(asyncio.run(async_estimator(url=url, verbose=False)))
+    end_time = time()
+    print(f"Async time elapsed: {end_time - start_time}s")

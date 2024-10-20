@@ -6,9 +6,13 @@ from pydantic import BaseModel, Field
 
 class CO2perKg(BaseModel):
     ingredient: str = Field(description="Name of ingredient")
-    comment: str = Field(description="Comment about result. For instance what closest result is.")
+    comment: str = Field(
+        description="Comment about result. For instance what closest result is."
+    )
     unit: str = Field(description="The unit which is kg CO2e per kg")
-    co2_per_kg: Optional[float] = Field(description="kg CO2 per kg for ingredient", default=None)
+    co2_per_kg: Optional[float] = Field(
+        description="kg CO2 per kg for ingredient", default=None
+    )
 
 
 class CO2Emissions(BaseModel):

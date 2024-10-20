@@ -15,89 +15,14 @@ from food_co2_estimator.output_parsers.search_co2_estimator import (
 )
 from food_co2_estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
 from food_co2_estimator.output_parsers.weight_estimator import weight_output_parser
-from food_co2_estimator.prompt_templates.recipe_extractor import recipe_output_parser
 from food_co2_estimator.utils import generate_output, get_url_text
 
 
-# TO-DO: Implement better coding practices (No Exception etc.)
-def estimator(
-    url: str,
-    verbose: bool = False,
-    negligeble_threshold: float = 0.01,
-):
-    if validators.url(url):
-        # Get URL text
-        text = get_url_text(url)
-    else:
-        text = url
-
-    # Extract ingredients from text
-    recipe_extractor_chain = get_recipe_extractor_chain()
-    ingredients = recipe_extractor_chain.run(text)
-    parsed_ingredients = recipe_output_parser.parse(ingredients)
-    if not parsed_ingredients:
-        return "I can't find a recipe in the provided URL / text"
-
-    # Detect language in ingredients
-    language = detect(ingredients)
-    if language != "en" and language != "da":
-        return "Language is not recognized as Danish or English"
-
-    try:
-        # Estimate weights using weight estimator
-        weight_estimator_chain = get_weight_estimator_chain(
-            language=language, verbose=verbose
-        )
-        weight_output = weight_estimator_chain.run(ingredients)
-        parsed_weight_output = weight_output_parser.parse(weight_output)
-    except Exception:
-        return "Something went wrong in estimating weights of ingredients."
-
-    try:
-        # Estimate the kg CO2e per kg for each weight ingredien
-        co2_sql_chain = get_co2_sql_chain(language=language, verbose=verbose)
-        co2_query_input = [
-            item.ingredient
-            for item in parsed_weight_output.weight_estimates
-            if item.weight_in_kg is not None
-            and item.weight_in_kg > negligeble_threshold
-        ]
-        co2_query_input_str = str(co2_query_input)
-        sql_output = co2_sql_chain.invoke(co2_query_input_str)
-        parsed_sql_output = sql_co2_output_parser.parse(sql_output["result"])
-    except Exception:
-        return "Something went wrong in estimating kg CO2e per kg for the ingredients"
-
-    # Check if any ingredients needs CO2 search
-    try:
-        co2_search_input_items = [
-            item.ingredient
-            for item in parsed_sql_output.emissions
-            if item.co2_per_kg is None
-        ]
-        search_agent = get_co2_google_search_agent(verbose=verbose)
-        search_results = [search_agent.invoke(item) for item in co2_search_input_items]
-        parsed_search_results = [
-            search_co2_output_parser.parse(result["output"])
-            for result in search_results
-        ]
-    except Exception:
-        print("Something went wrong when searching for kg CO2e per kg")
-        parsed_search_results = []
-
-    return generate_output(
-        weight_estimates=parsed_weight_output,
-        co2_emissions=parsed_sql_output,
-        search_results=parsed_search_results,
-        negligeble_threshold=negligeble_threshold,
-    )
-
-
-# TO-DO: Implement better coding practices (No Exception etc.)
+# TO-DO: Implement Runnable Interface instead and set prompttemplaces outside of model calls
 async def async_estimator(
     url: str,
     verbose: bool = False,
-    negligeble_threshold: float = 0.01,
+    negligeble_threshold: float = 0.05,
 ):
     if validators.url(url):
         # Get URL text
@@ -146,7 +71,8 @@ async def async_estimator(
             item.ingredient
             for item in parsed_weight_output.weight_estimates
             if item.weight_in_kg is not None
-            and item.weight_in_kg > negligeble_threshold
+            and item.weight_in_kg >= negligeble_threshold
+            and item.ignore is False
         ]
         co2_query_input_str = str(co2_query_input)
         output = await co2_sql_chain.ainvoke(

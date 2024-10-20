@@ -54,6 +54,7 @@ Search example: red lentils kg CO2e per kg.
 
 You must extract the kg CO2e per kg from the search results.
 Do not provide any ranges for the final search result. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final search result.
+It is very important that you provide your output/answer wrt. to the JSON format below above. Otherwise, your answer is useless.
 Remember the "ingredient" key must be the original input: '{input}'.
 
 Begin!

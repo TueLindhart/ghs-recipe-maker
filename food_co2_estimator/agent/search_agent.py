@@ -1,9 +1,9 @@
 from typing import Literal
 
-from langchain import GoogleSearchAPIWrapper, GoogleSerperAPIWrapper, LLMChain
 from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
+from langchain.chains.llm import LLMChain
+from langchain_community.utilities import GoogleSearchAPIWrapper, GoogleSerperAPIWrapper
+from langchain_core.prompts import PromptTemplate
 
 from food_co2_estimator.output_parsers.search_co2_estimator import (
     search_co2_output_parser,
@@ -13,6 +13,7 @@ from food_co2_estimator.prompt_templates.search_co2_estimator import (
     SEARCH_AGENT_PROMPT_PREFIX,
     SEARCH_AGENT_PROMPT_SUFFIX,
 )
+from food_co2_estimator.utils.openai_model import get_model
 
 
 def get_co2_google_search_agent(
@@ -61,7 +62,7 @@ def get_co2_google_search_agent(
     )
 
     llm_chain = LLMChain(
-        llm=ChatOpenAI(temperature=0),  # type: ignore
+        llm=get_model(),  # type: ignore
         prompt=prompt,
     )
 

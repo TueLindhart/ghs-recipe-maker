@@ -1,11 +1,11 @@
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
+from langchain.chains.llm import LLMChain
 from langchain.prompts.prompt import PromptTemplate
 
 from food_co2_estimator.prompt_templates.recipe_extractor import (
     RECIPE_EXTRACTOR_PROMPT,
     recipe_output_parser,
 )
+from food_co2_estimator.utils.openai_model import get_model
 
 
 def get_recipe_extractor_chain(verbose: bool = False):
@@ -18,8 +18,5 @@ def get_recipe_extractor_chain(verbose: bool = False):
         output_parser=recipe_output_parser,
     )
 
-    llm = ChatOpenAI(  # type: ignore
-        temperature=0,
-    )
-    recipe_extractor_chain = LLMChain(llm=llm, prompt=prompt, verbose=verbose)
+    recipe_extractor_chain = LLMChain(llm=get_model(), prompt=prompt, verbose=verbose)
     return recipe_extractor_chain

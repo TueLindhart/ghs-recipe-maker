@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 from food_co2_estimator.output_parsers.weight_estimator import weight_output_parser
 

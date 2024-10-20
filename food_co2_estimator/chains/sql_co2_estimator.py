@@ -1,14 +1,16 @@
 import os
 from typing import Literal
 
-from langchain.chat_models import ChatOpenAI
-from langchain.sql_database import SQLDatabase
+from langchain.chains.llm import LLMChain
+from langchain_community.utilities import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
+from langchain_openai import ChatOpenAI
 
 from food_co2_estimator.prompt_templates.sql_co2_estimator import (
     DK_CO2_SQL_PROMPT_TEMPLATE,
     EN_CO2_SQL_PROMPT_TEMPLATE,
 )
+from food_co2_estimator.utils.openai_model import get_model
 
 
 def get_co2_sql_chain(language: Literal["da", "en"], verbose: bool = False):
@@ -16,16 +18,20 @@ def get_co2_sql_chain(language: Literal["da", "en"], verbose: bool = False):
         f"sqlite:///{os.getcwd()}/food_co2_estimator/data/dk_co2_emission.db",
         sample_rows_in_table_info=2,
     )
-    llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")  # type: ignore
-    co2_sql_chain = SQLDatabaseChain.from_llm(
-        llm=llm,
-        db=sql_dk_co2_db,
-        verbose=verbose,
+    llm_chain = LLMChain(
+        llm=get_model(),
         prompt=(
             EN_CO2_SQL_PROMPT_TEMPLATE
             if language == "en"
             else DK_CO2_SQL_PROMPT_TEMPLATE
         ),
+        verbose=verbose,
+    )
+
+    co2_sql_chain = SQLDatabaseChain(
+        llm_chain=llm_chain,
+        database=sql_dk_co2_db,
+        verbose=verbose,
         top_k=200,
     )
 

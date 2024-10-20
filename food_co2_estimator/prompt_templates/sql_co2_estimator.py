@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 from food_co2_estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
 
@@ -261,8 +261,6 @@ DK_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "example_query": DK_SQL_QUERY_EXAMPLE,
         "example_removing": DK_EXAMPLE_REMOVING,
         "example_match": DK_EXAMPLE_MATCH,
-        # "example_answer": DK_EXAMPLE_ANSWER_FOUND,
-        # "example_not_found": DK_EXAMPLE_ANSWER_NOT_FOUND,
         "ingredients_example": DK_INGREDIENTS_EXAMPLE,
         "query_example": DK_SQL_QUERY_EXAMPLE,
         "query_result_example": DK_SQL_RESULT_EXAMPLE,

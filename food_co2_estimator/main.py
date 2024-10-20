@@ -62,8 +62,8 @@ def estimator(
             and item.weight_in_kg > negligeble_threshold
         ]
         co2_query_input_str = str(co2_query_input)
-        sql_output = co2_sql_chain.run(co2_query_input_str)
-        parsed_sql_output = sql_co2_output_parser.parse(sql_output)
+        sql_output = co2_sql_chain.invoke(co2_query_input_str)
+        parsed_sql_output = sql_co2_output_parser.parse(sql_output["result"])
     except Exception:
         return "Something went wrong in estimating kg CO2e per kg for the ingredients"
 
@@ -75,7 +75,7 @@ def estimator(
             if item.co2_per_kg is None
         ]
         search_agent = get_co2_google_search_agent(verbose=verbose)
-        search_results = [search_agent.run(item) for item in co2_search_input_items]
+        search_results = [search_agent.invoke(item) for item in co2_search_input_items]
         parsed_search_results = [
             search_co2_output_parser.parse(result) for result in search_results
         ]
@@ -145,7 +145,7 @@ async def async_estimator(
             and item.weight_in_kg > negligeble_threshold
         ]
         co2_query_input_str = str(co2_query_input)
-        sql_output = co2_sql_chain.run(
+        sql_output = await co2_sql_chain.arun(
             co2_query_input_str,
         )
         try:
@@ -197,15 +197,16 @@ if __name__ == "__main__":
     start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
-    url = """1 stk tomat
-             1 glas oliven
-             200 g løg
-          """
+    # url = """1 stk tomat
+    #          1 glas oliven
+    #          200 g løg
+    #       """
     # print(estimator(url, verbose=False))
     # end_time = time()
     # print(f"Time elapsed: {end_time - start_time}s")
 
     start_time = time()
-    print(asyncio.run(async_estimator(url=url, verbose=False)))
+    # print(asyncio.run(async_estimator(url=url, verbose=True)))
+    estimator(url=url, verbose=True)
     end_time = time()
     print(f"Async time elapsed: {end_time - start_time}s")

@@ -77,7 +77,8 @@ def estimator(
         search_agent = get_co2_google_search_agent(verbose=verbose)
         search_results = [search_agent.invoke(item) for item in co2_search_input_items]
         parsed_search_results = [
-            search_co2_output_parser.parse(result) for result in search_results
+            search_co2_output_parser.parse(result["output"])
+            for result in search_results
         ]
     except Exception:
         print("Something went wrong when searching for kg CO2e per kg")
@@ -206,7 +207,7 @@ if __name__ == "__main__":
     # print(f"Time elapsed: {end_time - start_time}s")
 
     start_time = time()
-    # print(asyncio.run(async_estimator(url=url, verbose=True)))
-    estimator(url=url, verbose=True)
+    print(asyncio.run(async_estimator(url=url, verbose=True)))
+    # estimator(url=url, verbose=True)
     end_time = time()
     print(f"Async time elapsed: {end_time - start_time}s")

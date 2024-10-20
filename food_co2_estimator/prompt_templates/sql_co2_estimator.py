@@ -8,10 +8,8 @@ DK_LANGUAGE = "Danish"
 EN_EXAMPLE_QUERY = "'SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Name LIKE '%tomato%' OR Name LIKE '%bouillon%'"
 DK_EXAMPLE_QUERY = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomat%' OR Navn LIKE '%bouillion%'"
 
-EN_EXAMPLE_REMOVING = "'SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE Navn LIKE '%tomato%' OR Navn LIKE '%bouillion%'"
-DK_EXAMPLE_REMOVING = (
-    "'%hakkede tomater%' to '%tomat%' or '%hakket oksekød%' to '%oksekød%'"
-)
+EN_EXAMPLE_REMOVING = "'%chopped tomatoes%' to '%tomato%' or '%minced beef%' to '%beef%' or '%spaghetti%' to '%pasta%' or '%lasagna sheets%' to '%pasta%'"
+DK_EXAMPLE_REMOVING = "'%hakkede tomater%' to '%tomat%' or '%hakket oksekød%' to '%oksekød%' or '%spaghetti%' to '%pasta%' or '%lasagne plader%' to '%pasta%'"
 
 EN_EXAMPLE_MATCH = (
     "'1 can of chopped tomatoes' best matches results from 'Tomato, peeled, canned'."
@@ -34,6 +32,7 @@ EN_INGREDIENTS_EXAMPLE = """
 1 tbsp. lemon juice
 1. tbsp. chili powder
 1 starfruit
+400 g spaghetti
 """
 
 DK_INGREDIENTS_EXAMPLE = """
@@ -45,6 +44,7 @@ DK_INGREDIENTS_EXAMPLE = """
 1. spsk. chilipulver
 10 majstortillas
 1 stjernefrugt
+400 g spaghetti
 """
 
 EN_SQL_QUERY_EXAMPLE = """
@@ -55,7 +55,8 @@ SELECT Name, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
           Name LIKE '%juice%' OR
           Name LIKE '%lemon%' OR
           Name LIKE '%chili%' OR
-          Name LIKE '%starfruit%'
+          Name LIKE '%starfruit%' OR
+          Name LIKE '%pasta%'
 """
 
 DK_SQL_QUERY_EXAMPLE = """
@@ -67,7 +68,8 @@ SELECT Navn, Total_kg_CO2_eq_kg FROM dk_co2_emission WHERE
           Navn LIKE '%citron%' OR
           Navn LIKE '%chili%' OR
           Navn LIKE '%tortilla%' OR
-          Navn LIKE '%stjernefrugt%'
+          Navn LIKE '%stjernefrugt%' OR
+          Navn LIKE '%pasta%'
 """
 
 EN_SQL_RESULT_EXAMPLE = """
@@ -78,6 +80,7 @@ EN_SQL_RESULT_EXAMPLE = """
             ('Apple juice', 1.64),('Bouillon, chicken, prepared', 0.38)
             ('Bouillon, beef, prepared', 0.52), ('Pepper, hot chili, raw', 1.02)
             ('Pepper, hot chili, canned', 1.54),
+            ('Pasta', 1.73),
             ]
 """
 
@@ -89,6 +92,7 @@ DK_SQL_RESULT_EXAMPLE = """
             ('Æblejuice', 1.64),('Bouillon, hønsekød, spiseklar', 0.38)
             ('Bouillon, oksekød, spiseklar', 0.52), ('Peber, chili, rå', 1.02)
             ('Tortillabrød, hvede',0.74), ('Peber, chili, konserves', 1.54),
+            ('Pasta', 1.73),
             ]
 """
 
@@ -136,7 +140,13 @@ EN_FINAL_ANSWER_EXAMPLE = """
       "comment": "Not found in database",
       "unit": "kg CO2e / kg",
       "co2_per_kg": null
-    }
+    },
+    {
+      "ingredient": "400 g spaghetti",
+      "comment": "closest was 'Pasta'",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.73,
+    },
   ]
 }
 """
@@ -191,7 +201,13 @@ DK_FINAL_ANSWER_EXAMPLE = """
       "comment": "Ikke fundet i databasen",
       "unit": "kg CO2e / kg",
       "co2_per_kg": null
-    }
+    },
+      {
+      "ingredient": "400 g spaghetti",
+      "comment": "closest was 'Pasta'",
+      "unit": "kg CO2e / kg",
+      "co2_per_kg": 1.73,
+    },
   ]
 }
 """
@@ -202,10 +218,11 @@ Given a list of ingredients in {language}, extract the main ingredients from the
 and create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
 
 Solve the task using the following steps:
-- Query all ingredients in a single query. Make sure you query ALL the ingredients provided after `Ingredients:`
+- Query all ingredients in a single query using the root of the ingredient. Make sure you query ALL the ingredients provided after `Ingredients:`
+  and remove ALL non-ingredient words (for example: hakket/chopped can be removed but 'tomat/tomato' is the root of the ingredient).
+  Also, translate ingredients in query to a more broad description such as spaghetti is pasta or parmesan is cheese.
+  Example of removing and translating: {example_removing}
   Example query: {example_query}
-- In the query, remove all non-ingredient words.
-  Example of removing: {example_removing}
 - Match the SQLResult to the list of ingredients based on preparation and type.
   Example match: {example_match}
 - Return the Answer by the format instructions explained below.

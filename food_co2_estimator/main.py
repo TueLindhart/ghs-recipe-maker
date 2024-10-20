@@ -129,7 +129,8 @@ if __name__ == "__main__":
 
     start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
-    url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
+    # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
+    url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

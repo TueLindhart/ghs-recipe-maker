@@ -4,7 +4,6 @@ from typing import Literal
 from langchain.chains.llm import LLMChain
 from langchain_community.utilities import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
-from langchain_openai import ChatOpenAI
 
 from food_co2_estimator.prompt_templates.sql_co2_estimator import (
     DK_CO2_SQL_PROMPT_TEMPLATE,

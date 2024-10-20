@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any, Dict
 
 import validators
 from langchain.schema.output_parser import OutputParserException
@@ -108,7 +109,8 @@ async def async_estimator(
 
     # Extract ingredients from text
     recipe_extractor_chain = get_recipe_extractor_chain()
-    ingredients: str = await recipe_extractor_chain.arun(text)
+    output: Dict[str, Any] = await recipe_extractor_chain.ainvoke({"input": text})
+    ingredients = output["text"]
     if "no ingredients" in ingredients.lower():
         if is_url:
             return "I can't find a recipe in the provided URL. Try manually inserting ingredients list"
@@ -126,7 +128,8 @@ async def async_estimator(
         weight_estimator_chain = get_weight_estimator_chain(
             language=language, verbose=verbose
         )
-        weight_output = await weight_estimator_chain.arun(ingredients)
+        output = await weight_estimator_chain.ainvoke({"input": ingredients})
+        weight_output = output["text"]
         try:
             parsed_weight_output = weight_output_parser.parse(weight_output)
         except OutputParserException:
@@ -146,14 +149,15 @@ async def async_estimator(
             and item.weight_in_kg > negligeble_threshold
         ]
         co2_query_input_str = str(co2_query_input)
-        sql_output = await co2_sql_chain.arun(
-            co2_query_input_str,
+        output = await co2_sql_chain.ainvoke(
+            {"query": co2_query_input_str},
         )
+        sql_result = output["result"]
         try:
-            parsed_sql_output = sql_co2_output_parser.parse(sql_output)
+            parsed_sql_output = sql_co2_output_parser.parse(sql_result)
         except OutputParserException:
             retry_parser = get_retry_parser(sql_co2_output_parser)
-            parsed_sql_output = retry_parser.parse(sql_output)
+            parsed_sql_output = retry_parser.parse(sql_result)
     except Exception as e:
         print(str(e))
         return "Something went wrong in estimating kg CO2e per kg for the ingredients"
@@ -166,16 +170,18 @@ async def async_estimator(
             if item.co2_per_kg is None
         ]
         search_agent = get_co2_google_search_agent(verbose=verbose)
-        tasks = [search_agent.arun(q) for q in co2_search_input_items]
+        tasks = [search_agent.ainvoke({"input": q}) for q in co2_search_input_items]
         search_results = await asyncio.gather(*tasks)
         parsed_search_results = []
 
         for result in search_results:
             try:
-                parsed_search_results.append(search_co2_output_parser.parse(result))
+                parsed_search_results.append(
+                    search_co2_output_parser.parse(result["output"])
+                )
             except OutputParserException:
                 retry_parser = get_retry_parser(search_co2_output_parser)
-                parsed_search_results.append(retry_parser.parse(result))
+                parsed_search_results.append(retry_parser.parse(result["output"]))
     except Exception as e:
         print(str(e))
         print("Something went wrong when searching for kg CO2e per kg")

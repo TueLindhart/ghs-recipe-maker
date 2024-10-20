@@ -22,7 +22,7 @@ from food_co2_estimator.utils import generate_output, get_url_text
 async def async_estimator(
     url: str,
     verbose: bool = False,
-    negligeble_threshold: float = 0.05,
+    negligeble_threshold: float = 0.01,
 ):
     if validators.url(url):
         # Get URL text

@@ -1,4 +1,5 @@
 import asyncio
+import re
 from typing import Any, Dict
 
 import validators
@@ -9,6 +10,7 @@ from food_co2_estimator.agent.search_agent import get_co2_google_search_agent
 from food_co2_estimator.chains.recipe_extractor import get_recipe_extractor_chain
 from food_co2_estimator.chains.sql_co2_estimator import get_co2_sql_chain
 from food_co2_estimator.chains.weight_estimator import get_weight_estimator_chain
+from food_co2_estimator.output_parsers.recipe_extractor import Recipe
 from food_co2_estimator.output_parsers.retry_parser import get_retry_parser
 from food_co2_estimator.output_parsers.search_co2_estimator import (
     search_co2_output_parser,
@@ -35,14 +37,23 @@ async def async_estimator(
     # Extract ingredients from text
     recipe_extractor_chain = get_recipe_extractor_chain()
     output: Dict[str, Any] = await recipe_extractor_chain.ainvoke({"input": text})
-    ingredients = output["text"]
-    if "no ingredients" in ingredients.lower():
+    recipe: Recipe = output["text"]
+    if len(recipe.ingredients) == 0:
         if is_url:
             return "I can't find a recipe in the provided URL. Try manually inserting ingredients list"
         return "Cannot find any ingredients"
 
+    # If number is provided in url, then use that instead of llm estimate
+    if is_url:
+        persons = extract_person_from_url(url)
+        recipe.persons = persons if persons is not None else recipe.persons
+
     # Detect language in ingredients
-    language = detect(ingredients)
+    language = (
+        detect(recipe.instructions)
+        if recipe.instructions
+        else detect(recipe.ingredients)
+    )
     if language in ["no", "sv"]:  # Swedish and Norwegian is easy mistakes
         language = "da"
     if language != "en" and language != "da":
@@ -53,7 +64,7 @@ async def async_estimator(
         weight_estimator_chain = get_weight_estimator_chain(
             language=language, verbose=verbose
         )
-        output = await weight_estimator_chain.ainvoke({"input": ingredients})
+        output = await weight_estimator_chain.ainvoke({"input": recipe.ingredients})
         weight_output = output["text"]
         try:
             parsed_weight_output = weight_output_parser.parse(weight_output)
@@ -118,8 +129,16 @@ async def async_estimator(
         co2_emissions=parsed_sql_output,
         search_results=parsed_search_results,
         negligeble_threshold=negligeble_threshold,
+        number_of_persons=recipe.persons,
         language=language,
     )
+
+
+def extract_person_from_url(url) -> int | None:
+    match = re.match(r".*\?antal=(\d+)", url)
+    if match:
+
+        return int(match.group(1))
 
 
 if __name__ == "__main__":

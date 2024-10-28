@@ -69,6 +69,7 @@ EN_INPUT_EXAMPLE = """
 pepper
 2 large potatoes
 1 bunch asparagus
+1 duck, ca. 2 kg
 """
 
 DK_INPUT_EXAMPLE = """
@@ -84,6 +85,7 @@ DK_INPUT_EXAMPLE = """
 peber
 2 store kartofler
 1 bdt asparges
+1 and, ca. 2 kg
 """
 
 DK_ANSWER_EXAMPLE = """
@@ -159,6 +161,12 @@ DK_ANSWER_EXAMPLE = """
       "ingredient": "1 bdt asparges",
       "weight_calculation": "1 bdt asparges = 500 g = 0.500 kg",
       "weight_in_kg": 0.5,
+      "ignore": "false",
+    },
+    {
+      "ingredient": "1 duck,
+      "weight_calculation": "1 duck, ca. 2 kg = 2.0 kg",
+      "weight_in_kg": 2.0,
       "ignore": "false",
     }
   ]
@@ -239,6 +247,12 @@ EN_ANSWER_EXAMPLE = """
       "ingredient": "1 bunch asparagus",
       "weight_calculation": "1 bunch asparagus = 500 g = 0.500 kg",
       "weight_in_kg": 0.5,
+      "ignore": "false",
+    },
+    {
+      "ingredient": "1 and,
+      "weight_calculation": "1 and, ca. 2 kg = 2.0 kg",
+      "weight_in_kg": 2.0,
       "ignore": "false",
     }
   ]

@@ -4,12 +4,24 @@ from food_co2_estimator.output_parsers.search_co2_estimator import CO2SearchResu
 from food_co2_estimator.output_parsers.sql_co2_estimator import CO2Emissions
 from food_co2_estimator.output_parsers.weight_estimator import WeightEstimates
 
+# Avg. dinner emission per person method:
+# 1. Get Food emission per person per year here: https://concito.dk/udgivelser/danmarks-globale-forbrugsudledninger which is 1.97 ton / per capita
+# 2. Estimate emission per day per capita: 1.97 / 365.25 * 1000 = 5.39 kg CO2 / per capita
+# 3. Calculate ratio of dinenr calorie amount wrt. to daily calorie intake:
+#     Minimum case; 600 calories / 2500 calories = 0.24. Maximum case: 0.4. Avg. case = 700 / 2250 = 0.31
+# 4. Assume dinner emission is equivalent to amount of calories to estimate avg. dinner emission.
+#    5.39 * 0.24 = 1.69 kg CO2 per capita
+
+MIN_DINNER_EMISSION_PER_CAPITA = 1.3
+MAX_DINNER_EMISSION_PER_CAPITA = 2.2
+
 
 def generate_output(
     weight_estimates: WeightEstimates,
     co2_emissions: CO2Emissions,
     search_results: List[CO2SearchResult],
     negligeble_threshold: float,
+    number_of_persons: int | None,
     language: str = "en",
 ) -> str:
     translations = {
@@ -18,9 +30,9 @@ def generate_output(
             "negligible": "weight on {} kg is negligible",
             "not_found": "CO2e per kg not found",
             "total": "Total CO2 emission",
-            "total_weight": "Total Weight",
-            "emission_pr_kg": "Emission pr. kg.",
-            "avg_meal_emission_pr_kg": "Avg. Danish meal emission pr kg",
+            "persons": "Estimated number of persons",
+            "emission_pr_person": "Emission pr. person",
+            "avg_meal_emission_pr_person": "Avg. Danish dinner emission pr person",
             "method": "The calculation method per ingredient is",
             "legends": "Legends",
             "db": "(DB) - Data from SQL Database (https://denstoreklimadatabase.dk)",
@@ -33,9 +45,9 @@ def generate_output(
             "negligible": "vægt på {} kg er ubetydelig",
             "not_found": "CO2e per kg ikke fundet",
             "total": "Samlet CO2-udslip",
-            "total_weight": "Samlet vægt",
-            "emission_pr_kg": "Emission pr. kg.",
-            "avg_meal_emission_pr_kg": "Gennemsnitligt udledning for dansk måltid",
+            "persons": "Estimeret antal personer",
+            "emission_pr_person": "Emission pr. person",
+            "avg_meal_emission_pr_person": "Gennemsnitligt aftensmad udledning pr. person",
             "method": "Beregningsmetoden pr. ingrediens er",
             "legends": "Forklaring",
             "db": "(DB) - Data fra SQL Database (https://denstoreklimadatabase.dk)",
@@ -49,7 +61,6 @@ def generate_output(
 
     ingredients_output = []
     total_co2 = 0
-    total_weight = 0
     all_comments = []
 
     for weight_estimate in weight_estimates.weight_estimates:
@@ -79,9 +90,6 @@ def generate_output(
         all_comments.append(
             {"ingredient": weight_estimate.ingredient, "comments": comments}
         )
-
-        if weight_estimate.weight_in_kg is not None:
-            total_weight += weight_estimate.weight_in_kg
 
         if weight_estimate.weight_in_kg is None:
             ingredients_output.append(
@@ -113,13 +121,19 @@ def generate_output(
             ingredients_output.append(
                 f"{weight_estimate.ingredient}: {trans['not_found']}"
             )
+    if number_of_persons is not None:
+        number_of_persons_text = f"\n{trans['persons']}: {number_of_persons}"
+        emission_per_person_text = f"\n{trans['emission_pr_person']}: {round(total_co2/number_of_persons,1)} kg CO2e / pr. person"
+    else:
+        number_of_persons_text = ""
+        emission_per_person_text = ""
 
     output = (
         "----------------------------------------"
-        f"\n{trans['total']}: {round(total_co2,2)} kg CO2e"
-        f"\n{trans['total_weight']}: {round(total_weight,2)} kg"
-        f"\n{trans['emission_pr_kg']}: {round(total_co2/total_weight,2)} kg CO2e / kg"
-        f"\n{trans['avg_meal_emission_pr_kg']}: 3.56 kg CO2e / kg"
+        f"\n{trans['total']}: {round(total_co2,1)} kg CO2e"
+        f"{number_of_persons_text}"
+        f"{emission_per_person_text}"
+        f"\n{trans['avg_meal_emission_pr_person']}: {MIN_DINNER_EMISSION_PER_CAPITA} - {MAX_DINNER_EMISSION_PER_CAPITA} kg CO2e / pr. person"
         "\n----------------------------------------"
         f"\n{trans['method']}: X kg * Y kg CO2e / kg = Z kg CO2e"
     )

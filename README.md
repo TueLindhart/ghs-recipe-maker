@@ -13,3 +13,9 @@ run the following command:
 ```bash
 poetry export --without-hashes --format=requirements.txt > requirements.txt
 ```
+
+Monitor app output with
+
+```bash
+heroku logs --source app
+```

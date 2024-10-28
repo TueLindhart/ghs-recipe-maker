@@ -19,6 +19,8 @@ from food_co2_estimator.output_parsers.sql_co2_estimator import sql_co2_output_p
 from food_co2_estimator.output_parsers.weight_estimator import weight_output_parser
 from food_co2_estimator.utils import generate_output, get_url_text
 
+NUMBER_PERSONS_REGEX = r".*\?antal=(\d+)"
+
 
 # TO-DO: Implement Runnable Interface instead and set prompttemplaces outside of model calls
 async def async_estimator(
@@ -46,13 +48,13 @@ async def async_estimator(
     # If number is provided in url, then use that instead of llm estimate
     if is_url:
         persons = extract_person_from_url(url)
-        recipe.persons = persons if persons is not None else recipe.persons
+        recipe.persons = persons if isinstance(persons, int) else recipe.persons
 
     # Detect language in ingredients
     language = (
         detect(recipe.instructions)
         if recipe.instructions
-        else detect(recipe.ingredients)
+        else detect(", ".join(recipe.ingredients))
     )
     if language in ["no", "sv"]:  # Swedish and Norwegian is easy mistakes
         language = "da"
@@ -135,9 +137,8 @@ async def async_estimator(
 
 
 def extract_person_from_url(url) -> int | None:
-    match = re.match(r".*\?antal=(\d+)", url)
+    match = re.match(NUMBER_PERSONS_REGEX, url)
     if match:
-
         return int(match.group(1))
 
 

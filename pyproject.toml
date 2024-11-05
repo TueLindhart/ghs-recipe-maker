@@ -20,7 +20,13 @@ langchain-community = "^0.3.3"
 langchain-openai = "^0.2.3"
 langchain-experimental = "^0.3.2"
 pydantic = "^2.9.2"
+langchain-chroma = "^0.1.4"
+translate = "^3.6.1"
+deep-translator = "^1.11.4"
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]

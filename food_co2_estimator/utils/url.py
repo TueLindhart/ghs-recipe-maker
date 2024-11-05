@@ -4,9 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_url_text(
-    url: str, text_length: int = 1000
-):  # Expand text length when it needs to estmate CO2 of cooking methods
+def get_full_url_text(url: str):
+    # Expand text length when it needs to estmate CO2 of cooking methods
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     }
@@ -31,6 +30,11 @@ def get_url_text(
 
     # Should make this more robust
     text = text.lower()
+    return text
+
+
+def get_url_text(url: str, text_length: int = 1000):
+    text = get_full_url_text(url=url)
 
     results = re.findall(r"(ingredi.*\S)", text)
     return " ".join([result[:text_length] for result in results])

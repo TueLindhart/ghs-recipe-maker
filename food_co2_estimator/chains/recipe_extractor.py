@@ -1,18 +1,13 @@
-from langchain.chains.llm import LLMChain
+from langchain_core.runnables import Runnable
 
-from food_co2_estimator.prompt_templates.recipe_extractor import (
-    RECIPE_EXTRACTOR_PROMPT,
-    recipe_output_parser,
-)
+from food_co2_estimator.output_parsers.recipe_extractor import Recipe
+from food_co2_estimator.prompt_templates.recipe_extractor import RECIPE_EXTRACTOR_PROMPT
 from food_co2_estimator.utils.openai_model import get_model
 
 
-def get_recipe_extractor_chain(verbose: bool = False):
+def get_recipe_extractor_chain(verbose: bool = False) -> Runnable:
 
-    recipe_extractor_chain = LLMChain(
-        llm=get_model(),
-        prompt=RECIPE_EXTRACTOR_PROMPT,
-        verbose=verbose,
-        output_parser=recipe_output_parser,
-    )
-    return recipe_extractor_chain
+    llm = get_model(pydantic_model=Recipe, model_name="gpt-4o-mini", verbose=verbose)
+
+    chain = RECIPE_EXTRACTOR_PROMPT | llm
+    return chain

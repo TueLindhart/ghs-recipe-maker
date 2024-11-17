@@ -13,9 +13,12 @@ def _translate_if_danish(inputs: List[str], language: str):
     if language == "en":
         return inputs
 
-    inputs_str = ", ".join(inputs)
+    inputs_str = "; ".join(inputs)
     translations = translator.translate(inputs_str)
-    return translations.split(", ")
+    translation_list = translations.split("; ")
+    if len(inputs) != len(translation_list):
+        raise ValueError("Input and translations length are not equal")
+    return translation_list
 
 
 def translate_if_danish(input: TranslateDict):

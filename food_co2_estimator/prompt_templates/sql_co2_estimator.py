@@ -1,6 +1,6 @@
 from langchain_core.prompts import PromptTemplate
 
-from food_co2_estimator.output_parsers.sql_co2_estimator import sql_co2_output_parser
+from food_co2_estimator.output_parsers.co2_estimator import co2_output_parser
 
 EN_LANGUAGE = "English"
 DK_LANGUAGE = "Danish"
@@ -265,7 +265,7 @@ EN_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "ingredients_example": EN_INGREDIENTS_EXAMPLE,
         "query_example": EN_SQL_QUERY_EXAMPLE,
         "query_result_example": EN_SQL_RESULT_EXAMPLE,
-        "format_instructions": sql_co2_output_parser.get_format_instructions(),
+        "format_instructions": co2_output_parser.get_format_instructions(),
         "final_answer_example": EN_FINAL_ANSWER_EXAMPLE,
     },
 )
@@ -281,7 +281,7 @@ DK_CO2_SQL_PROMPT_TEMPLATE = PromptTemplate(
         "ingredients_example": DK_INGREDIENTS_EXAMPLE,
         "query_example": DK_SQL_QUERY_EXAMPLE,
         "query_result_example": DK_SQL_RESULT_EXAMPLE,
-        "format_instructions": sql_co2_output_parser.get_format_instructions(),
+        "format_instructions": co2_output_parser.get_format_instructions(),
         "final_answer_example": DK_FINAL_ANSWER_EXAMPLE,
     },
 )

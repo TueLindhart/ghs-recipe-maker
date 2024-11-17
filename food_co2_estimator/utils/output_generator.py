@@ -1,7 +1,8 @@
 from typing import List
 
+from food_co2_estimator.language.detector import Languages
+from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions
 from food_co2_estimator.output_parsers.search_co2_estimator import CO2SearchResult
-from food_co2_estimator.output_parsers.sql_co2_estimator import CO2Emissions
 from food_co2_estimator.output_parsers.weight_estimator import WeightEstimates
 
 # Avg. dinner emission per person method:
@@ -22,10 +23,10 @@ def generate_output(
     search_results: List[CO2SearchResult],
     negligeble_threshold: float,
     number_of_persons: int | None,
-    language: str = "en",
+    language: Languages = Languages.English,
 ) -> str:
     translations = {
-        "en": {
+        Languages.English: {
             "unable": "unable to estimate weight",
             "negligible": "weight on {} kg is negligible",
             "not_found": "CO2e per kg not found",
@@ -40,9 +41,9 @@ def generate_output(
             "comments": "Comments",
             "for": "For",
         },
-        "da": {
+        Languages.Danish: {
             "unable": "kan ikke skønne vægt",
-            "negligible": "vægt på {} kg er ubetydelig",
+            "negligible": "vægt på {} kg er negligerbar",
             "not_found": "CO2e per kg ikke fundet",
             "total": "Samlet CO2-udslip",
             "persons": "Estimeret antal personer",
@@ -57,7 +58,7 @@ def generate_output(
         },
     }
 
-    trans = translations.get(language, translations["en"])
+    trans = translations.get(language, translations[Languages.English])
 
     ingredients_output = []
     total_co2 = 0

@@ -19,4 +19,4 @@ class CO2Emissions(BaseModel):
     emissions: List[CO2perKg]
 
 
-sql_co2_output_parser = PydanticOutputParser(pydantic_object=CO2Emissions)
+co2_output_parser = PydanticOutputParser(pydantic_object=CO2Emissions)

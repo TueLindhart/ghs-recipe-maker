@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-RAG_SO2_EMISSION_PROMPT_SYSTEM = """
+RAG_CO2_EMISSION_PROMPT_SYSTEM = """
 You are a bot that is expert in matching a list of ingredients to the best 
 emission options and returning the emissions in kg / Co2e kg provided.
 
@@ -19,16 +19,16 @@ These are the ingredient emission options:
 """
 
 
-RAG_SO2_EMISSION_PROMPT_INPUT_TEMPLATE = """
+RAG_CO2_EMISSION_PROMPT_INPUT_TEMPLATE = """
 Give me emissions for this list of ingredients:
 {ingredients}
 
 Begin!
 """
 
-RAG_SO2_EMISSION_PROMPT = ChatPromptTemplate.from_messages(
+RAG_CO2_EMISSION_PROMPT = ChatPromptTemplate.from_messages(
     [
-        ("system", RAG_SO2_EMISSION_PROMPT_SYSTEM),
-        ("human", RAG_SO2_EMISSION_PROMPT_INPUT_TEMPLATE),
+        ("system", RAG_CO2_EMISSION_PROMPT_SYSTEM),
+        ("human", RAG_CO2_EMISSION_PROMPT_INPUT_TEMPLATE),
     ]
 )

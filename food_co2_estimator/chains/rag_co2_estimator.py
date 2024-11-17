@@ -1,12 +1,10 @@
 from typing import List
 
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import Runnable, RunnableLambda, RunnablePassthrough
-from langchain_openai import ChatOpenAI
+from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 
-from food_co2_estimator.output_parsers.sql_co2_estimator import CO2Emissions
+from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions
 from food_co2_estimator.prompt_templates.rag_co2_estimator import (
-    RAG_SO2_EMISSION_PROMPT,
+    RAG_CO2_EMISSION_PROMPT,
 )
 from food_co2_estimator.retrievers.emission_retriever import (
     get_emission_retriever_chain,
@@ -19,12 +17,16 @@ def batch_emission_retriever(inputs: List[str]):
     return dict(zip(inputs, retriever_chain.batch(inputs)))
 
 
-def rag_co2_emission_chain() -> Runnable:
+def rag_co2_emission_chain(verbose: bool) -> RunnableSerializable:
 
-    llm = get_model(pydantic_model=CO2Emissions, model_name="gpt-4o-mini")
+    llm = get_model(
+        pydantic_model=CO2Emissions,
+        model_name="gpt-4o-mini",
+        verbose=verbose,
+    )
 
     return (
         {"context": batch_emission_retriever, "ingredients": RunnablePassthrough()}
-        | RAG_SO2_EMISSION_PROMPT
+        | RAG_CO2_EMISSION_PROMPT
         | llm
     )

@@ -2,6 +2,13 @@ from typing import Any, List, TypedDict
 
 from translate import Translator
 
+# PROVIDERS_CLASS = []
+#     'mymemory': MyMemoryProvider,
+#     'microsoft': MicrosoftProvider,
+#     'deepl': DeeplProvider,
+#     'libre': LibreProvider,
+# }
+
 
 class MyTranslator:
 

@@ -1,7 +1,6 @@
 from typing import List
 
 from langchain_core.documents import Document
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.vectorstores import VectorStoreRetriever
 
 from food_co2_estimator.data.vector_store import get_vector_store
@@ -22,7 +21,7 @@ def parse_retriever_output(documents: List[Document]):
     return results
 
 
-def get_emission_retriever_chain(k: int = 5, **kwargs):
+def get_emission_retriever_chain(k: int = 10, **kwargs):
     retriever = get_emission_retriever(k=k, **kwargs)
     return retriever | parse_retriever_output
 

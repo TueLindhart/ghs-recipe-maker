@@ -1,6 +1,18 @@
-from typing import List, TypedDict
+from typing import Any, List, TypedDict
 
 from translate import Translator
+
+
+class MyTranslator:
+
+    def __init__(self, translator: Any | None = None):
+        if translator is None:
+            translator = Translator(to_lang="en", from_lang="da")
+
+        self.translator = translator
+
+    def translate(self, text: str) -> str:
+        return self.translator.translate(text)
 
 
 class TranslateDict(TypedDict):
@@ -9,7 +21,7 @@ class TranslateDict(TypedDict):
 
 
 def _translate_if_danish(inputs: List[str], language: str):
-    translator = Translator(to_lang="en", from_lang="da")
+    translator = MyTranslator()
     if language == "en":
         return inputs
 

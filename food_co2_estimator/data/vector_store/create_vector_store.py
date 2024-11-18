@@ -18,7 +18,7 @@ emission_records_dk: List[Dict[Any, Any]] = df_dk.to_dict(orient="records")
 
 # Initialize vector store and translator
 vector_store = get_vector_store()
-translator = MyTranslator()
+translator = MyTranslator.default()
 
 documents = []
 uuids = []

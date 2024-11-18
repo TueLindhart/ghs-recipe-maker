@@ -1,25 +1,75 @@
-from typing import Any, List, TypedDict
+import logging
+import os
+from enum import Enum
+from typing import List, Protocol, TypedDict
 
+from deep_translator import GoogleTranslator
 from translate import Translator
 
-# PROVIDERS_CLASS = []
-#     'mymemory': MyMemoryProvider,
-#     'microsoft': MicrosoftProvider,
-#     'deepl': DeeplProvider,
-#     'libre': LibreProvider,
-# }
+from food_co2_estimator.language.detector import Languages
+
+# Global cache to keep track of the translator index
+_translation_cache = {"index": 0}
+
+
+class Translatable(Protocol):
+    def translate(self, text: str) -> str: ...
+
+
+class TranslationProviders(Enum):
+    MyMemory = "mymemory"
+    Microsft = "microsoft"
+    DeepL = "deepl"
+    Libre = "libre"
+
+
+SPLIT_STRING = "; "
+N_RETRIES = 2
 
 
 class MyTranslator:
+    def __init__(
+        self,
+        translators: List[Translatable],
+    ):
+        if not translators:
+            raise ValueError("No translators provided")
+        self.translators = translators
+        self.current_translator = self.translators[0]  # Default to the first translator
 
-    def __init__(self, translator: Any | None = None):
-        if translator is None:
-            translator = Translator(to_lang="en", from_lang="da")
+    @classmethod
+    def default(
+        cls,
+        from_lang: Languages = Languages.Danish,
+        to_lang: Languages = Languages.English,
+    ) -> "MyTranslator":
+        return cls(
+            translators=cls.create_translators(from_lang=from_lang, to_lang=to_lang)
+        )
 
-        self.translator = translator
+    @staticmethod
+    def create_translators(
+        from_lang: Languages = Languages.Danish,
+        to_lang: Languages = Languages.English,
+    ) -> List[Translatable]:
+        return [
+            GoogleTranslator(
+                source=from_lang.value,
+                target=to_lang.value,
+            ),
+            Translator(
+                from_lang=from_lang.value,
+                to_lang=to_lang.value,
+                provider=TranslationProviders.MyMemory.value,
+                email=os.getenv("MY_MAIL", None),
+            ),
+        ]
 
     def translate(self, text: str) -> str:
-        return self.translator.translate(text)
+        return self.current_translator.translate(text)
+
+    def switch_translator(self, index: int):
+        self.current_translator = self.translators[index % len(self.translators)]
 
 
 class TranslateDict(TypedDict):
@@ -28,15 +78,30 @@ class TranslateDict(TypedDict):
 
 
 def _translate_if_danish(inputs: List[str], language: str):
-    translator = MyTranslator()
     if language == "en":
         return inputs
 
-    inputs_str = "; ".join(inputs)
-    translations = translator.translate(inputs_str)
-    translation_list = translations.split("; ")
-    if len(inputs) != len(translation_list):
-        raise ValueError("Input and translations length are not equal")
+    inputs_str = SPLIT_STRING.join(inputs)
+    my_translator = MyTranslator.default()
+
+    # Retrieve the current index from the global cache
+    index = _translation_cache.get("index", 0)
+    my_translator.switch_translator(index)
+
+    for tries in range(N_RETRIES):
+        translations = my_translator.translate(inputs_str)
+        translation_list = translations.split(SPLIT_STRING)
+        if len(inputs) == len(translation_list):
+            return translation_list
+
+        logging.warning(
+            f"Translation failed. Trying other provider. Retry {tries + 1}/{N_RETRIES}"
+        )
+        # Update the index and switch the translator
+        index = (index + 1) % len(my_translator.translators)
+        _translation_cache["index"] = index
+        my_translator.switch_translator(index)
+
     return translation_list
 
 

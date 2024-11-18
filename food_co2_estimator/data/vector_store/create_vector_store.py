@@ -12,30 +12,33 @@ from food_co2_estimator.language.translator import MyTranslator
 
 # Read Excel files
 df_dk = pd.read_excel(EXCEL_FILE_DIR, sheet_name="DK")
+df_gb = pd.read_excel(EXCEL_FILE_DIR, sheet_name="GB")
 
 # Convert DataFrame to a list of dictionaries
 emission_records_dk: List[Dict[Any, Any]] = df_dk.to_dict(orient="records")
+emission_records_gb: List[Dict[Any, Any]] = df_gb.to_dict(orient="records")
 
 # Initialize vector store and translator
 vector_store = get_vector_store()
+vector_store.reset_collection()
 translator = MyTranslator.default()
 
 documents = []
 uuids = []
 
 # Loop over the records with a progress bar
-for id, emission_record_dk in enumerate(tqdm(emission_records_dk), 1):
+for id, (emission_record_dk, emission_record_gb) in enumerate(
+    tqdm(zip(emission_records_dk, emission_records_gb)), 1
+):
 
-    dk_name: str | None = emission_record_dk.get("Navn", None)
-    dk_name: str | None = emission_record_dk.get("Produkt", None)
-    if dk_name is None:
-        logging.warning(f"Object {emission_record_dk} is not added to DB")
+    en_name: str | None = emission_record_gb.get("Name", None)
+    if en_name is None:
+        logging.warning(f"Object {emission_record_gb} is not added to DB")
         continue
 
-    translated_name = translator.translate(dk_name)
     documents.append(
         Document(
-            page_content=translated_name,
+            page_content=en_name,
             metadata=emission_record_dk,
             id=id,
         )

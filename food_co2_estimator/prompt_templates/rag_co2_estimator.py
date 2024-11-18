@@ -29,7 +29,7 @@ Follow these rules to find the best match and extrapolate logically:
    - If multiple viable options exist, choose the one closest concerning the amount of processing the ingredient has undergone.
    - Processing includes any transformation such as drying, canning, fermenting, etc.
    - Processing steps for ingredients related to cooking should be ignored in determining best match.
-   - If NO processing is provided, then choose the least processed.
+   - If NO processing is provided for the ingredient, then choose the least processed or most raw option.
    - **Clarification Examples:**
      - 'Basil, dried' involves drying as a processing method.
      - 'Tomato, canned' involves canning as a processing method.

@@ -12,9 +12,6 @@ class WeightEstimate(BaseModel):
     weight_in_kg: Optional[float] = Field(
         description="Weight provided in kg", default=None
     )
-    ignore: bool = Field(
-        "If the ingredient is safe to ignore. Applies for example to water, salt, peber or any dry spices."
-    )
 
 
 class WeightEstimates(BaseModel):

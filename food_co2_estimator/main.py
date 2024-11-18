@@ -37,9 +37,7 @@ async def get_co2_emissions(
     ingredients_input = [
         item.ingredient
         for item in parsed_weight_output.weight_estimates
-        if item.weight_in_kg is not None
-        and item.weight_in_kg >= negligeble_threshold
-        and item.ignore is False
+        if item.weight_in_kg is not None and item.weight_in_kg >= negligeble_threshold
     ]
     # Translation specific to emission chain is temporary
     emission_chain_with_translation = translation_chain | emission_chain
@@ -190,7 +188,8 @@ if __name__ == "__main__":
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
     # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
-    url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    # url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    url = "https://www.valdemarsro.dk/red-thai-curry/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

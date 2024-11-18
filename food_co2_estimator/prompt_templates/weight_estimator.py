@@ -95,79 +95,66 @@ DK_ANSWER_EXAMPLE = """
       "ingredient": "1 dåse hakkede tomater",
       "weight_calculation": "1 dåse = 400 g = 0.4 kg",
       "weight_in_kg": 0.4,
-      "ignore": "false",
     },
     {
       "ingredient": "200 g pasta",
       "weight_calculation": "200 g = 0.2 kg",
       "weight_in_kg": 0.2,
-      "ignore": "false",
     },
     {
       "ingredient": "500 ml vand",
       "weight_calculation": "500 ml = 0.5 kg",
       "weight_in_kg": 0.5,
-      "ignore": "true",
     },
     {
       "ingredient": "250 gram hakket kød",
       "weight_calculation": "250 g = 0.25 kg",
       "weight_in_kg": 0.25,
-      "ignore": "false",
     },
     {
       "ingredient": "0.5 blomkål",
       "weight_calculation": "1 blomkål = 500 g (estimeret af LLM model) = 0.5 kg",
       "weight_in_kg": 0.5,
-      "ignore": "false",
     },
     {
       "ingredient": "1 tsk. sukker",
       "weight_calculation": "1 teskefuld = 5 g = 0.005 kg",
       "weight_in_kg": 0.005,
-      "ignore": "true",
       },
     {
       "ingredient": "1 økologisk citron",
       "weight_calculation": "1 citron = 85 g = 0.085 kg",
       "weight_in_kg": 0.085,
-      "ignore": "false",
     },
     {
       "ingredient": "3 teskefulde salt",
       "weight_calculation": "1 tsk. = 5 g, 3 * 5 g = 15 g = 0.015 kg",
       "weight_in_kg": 0.015,
-      "ignore": "true",
       },
     {
       "ingredient": "2 spsk. krydderi",
       "weight_calculation": "1 spsk. = 15 g, 2 * 15 g = 30 g = 0.030 kg",
       "weight_in_kg": 0.03,
-      "ignore": "true",
       },
     {
       "ingredient": "peber",
       "weight_calculation": "antal peber er ikke angivet.",
       "weight_in_kg": null,
-      "ignore": "true",
       },
     {
       "ingredient": "2 store kartofler",
       "weight_calculation": "1 stor kartoffel = 300 g, 2 * 300 g = 600 g = 0.6 kg",
       "weight_in_kg": 0.6,
-      "ignore": "false",
     },
     {
       "ingredient": "1 bdt asparges",
       "weight_calculation": "1 bdt asparges = 500 g = 0.500 kg",
       "weight_in_kg": 0.5,
-      "ignore": "false",
     },
     {
       "ingredient": "1 duck,
       "weight_calculation": "1 duck, ca. 2 kg = 2.0 kg",
       "weight_in_kg": 2.0,
-      "ignore": "false",
     }
   ]
 }
@@ -180,80 +167,66 @@ EN_ANSWER_EXAMPLE = """
       "ingredient": "1 can chopped tomatoes",
       "weight_calculation": "1 can = 400 g = 0.4 kg",
       "weight_in_kg": 0.4,
-      "ignore:" "false",
     },
     {
       "ingredient": "200 g pasta",
       "weight_calculation": "200 g = 0.2 kg",
       "weight_in_kg": 0.2
-      "ignore": "false",
     },
     {
       "ingredient": "500 ml water",
       "weight_calculation": "500 ml = 0.5 kg",
       "weight_in_kg": 0.5
-      "ignore": "true",
     },
     {
       "ingredient": "250 grams minced meat",
       "weight_calculation": "250 g = 0.25 kg",
       "weight_in_kg": 0.25,
-      "ignore": "false",
     },
     {
       "ingredient": "0.5 cauliflower",
       "weight_calculation": "1 cauliflower = 500 g (estimated by LLM model) = 0.5 kg",
       "weight_in_kg": 0.5,
-      "ignore": "false",
     },
     {
       "ingredient": "1 tsp. sugar",
       "weight_calculation": "1 teaspoon = 5 g = 0.005 kg",
       "weight_in_kg": 0.005,
-      "ignore": "true",
       },
     {
       "ingredient": "1 organic lemon",
       "weight_calculation": "1 lemon = 85 g = 0.085 kg",
       "weight_in_kg": 0.085,
-      "ignore": "false",
     },
     {
       "ingredient": "3 teaspoons salt",
       "weight_calculation": "1 tsp. = 5 g, 3 * 5 g = 15 g = 0.015 kg",
       "weight_in_kg": 0.015,
-      "ignore": "true",
       },
     {
       "ingredient": "2 tbsp. spices",
       "weight_calculation": "1 tbsp. = 15 g, 2 * 15 g = 30 g = 0.030 kg",
       "weight_in_kg": 0.03,
-      "ignore": "true",
       },
     {
       "ingredient": "pepper",
       "weight_calculation": "amount of pepper not specified",
       "weight_in_kg": null,
-      "ignore": "true",
       },
     {
       "ingredient": "2 large potatoes",
       "weight_calculation": "1 large potato = 300 g, 2 * 300 g = 600 g = 0.6 kg",
       "weight_in_kg": 0.6,
-      "ignore": "false",
-      
     },
     {
       "ingredient": "1 bunch asparagus",
       "weight_calculation": "1 bunch asparagus = 500 g = 0.500 kg",
       "weight_in_kg": 0.5,
-      "ignore": "false",
     },
     {
       "ingredient": "1 and,
       "weight_calculation": "1 and, ca. 2 kg = 2.0 kg",
       "weight_in_kg": 2.0,
-      "ignore": "false",
     }
   ]
 }
@@ -269,8 +242,6 @@ The following general weights can be used for estimation:
 If an ingredient is not found in the list of general weights, try to give your best estimate
 of the weight in kilogram/kg of the ingredient and say (estimated by LLM model).
 Your estimate must always be a python float. Therefore, you must not provide any intervals.
-If the ingredient has very low weight such as salt, peber or any dry spice, then you must
-provide ignore="true" as output.
 
 Input is given after "Ingredients:"
 

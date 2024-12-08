@@ -139,9 +139,20 @@ async def async_estimator(
         return (
             f"Language is not recognized as {', '.join([l.value for l in Languages])}"
         )
+
+    translator = get_translation_chain()
+    try:
+        translated_recipe = await translator.ainvoke(
+            {"recipe": recipe, "language": language}
+        )
+    except Exception as e:
+        print(str(e))
+        return "Something went wrong in translating recipies."
     try:
         # Estimate weights using weight estimator
-        parsed_weight_output = await get_weight_estimates(verbose, recipe, language)
+        parsed_weight_output = await get_weight_estimates(
+            verbose, translated_recipe, language
+        )
     except Exception as e:
         print(str(e))
         return "Something went wrong in estimating weights of ingredients."

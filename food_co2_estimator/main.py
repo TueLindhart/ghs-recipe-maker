@@ -187,8 +187,8 @@ if __name__ == "__main__":
     start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
-    # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
-    url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
+    # url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
     # url = "https://www.valdemarsro.dk/red-thai-curry/"
     # url = """1 stk tomat
     #          1 glas oliven

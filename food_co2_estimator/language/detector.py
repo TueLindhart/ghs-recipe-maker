@@ -16,7 +16,12 @@ ALLOWED_LANGUAGE_MISTAKES = [Languages.Norwegian.value, Languages.Swedish.value]
 
 
 def detect_language(recipe: Recipe) -> Languages | None:
-    language = detect(recipe.instructions)
+
+    language = (
+        detect(recipe.instructions)
+        if recipe.instructions is not None
+        else detect(", ".join(recipe.ingredients))
+    )
     if language in ALLOWED_LANGUAGE_MISTAKES:  # Swedish and Norwegian is easy mistakes
         return Languages.Danish
 

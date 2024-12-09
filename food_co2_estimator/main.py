@@ -29,26 +29,18 @@ NUMBER_PERSONS_REGEX = r".*\?antal=(\d+)"
 async def get_co2_emissions(
     verbose: bool,
     negligeble_threshold: float,
-    language: Languages,
     parsed_weight_output: WeightEstimates,
 ) -> CO2Emissions:
     emission_chain = rag_co2_emission_chain(verbose)
-    translation_chain = get_translation_chain()
+
     ingredients_input = [
         item.ingredient
         for item in parsed_weight_output.weight_estimates
         if item.weight_in_kg is not None and item.weight_in_kg >= negligeble_threshold
     ]
-    # Translation specific to emission chain is temporary
-    emission_chain_with_translation = translation_chain | emission_chain
-    parsed_rag_emissions: CO2Emissions = await emission_chain_with_translation.ainvoke(
-        input={"inputs": ingredients_input, "language": language.value}
-    )
-    # Temporary translation needed here until all runs on english only
-    for translated_emission, orig_ingredient in zip(
-        parsed_rag_emissions.emissions, ingredients_input
-    ):
-        translated_emission.ingredient = orig_ingredient
+
+    parsed_rag_emissions: CO2Emissions = await emission_chain.ainvoke(ingredients_input)
+
     return parsed_rag_emissions
 
 
@@ -77,22 +69,13 @@ def get_text_from_input(url: str) -> Tuple[bool, str]:
     return False, url
 
 
-async def get_weight_estimates(
-    verbose: bool, recipe: Recipe, language: Languages
-) -> WeightEstimates:
-    weight_estimator_chain = get_weight_estimator_chain(
-        language=language, verbose=verbose
-    )
-    output = await weight_estimator_chain.ainvoke({"input": recipe.ingredients})
-    weight_output = output["text"]
-    try:
-        parsed_weight_output: WeightEstimates = weight_output_parser.parse(
-            weight_output
-        )
-    except OutputParserException:
-        retry_parser = get_retry_parser(weight_output_parser)
-        parsed_weight_output: WeightEstimates = retry_parser.parse(weight_output)
-    return parsed_weight_output
+async def get_weight_estimates(verbose: bool, recipe: Recipe) -> WeightEstimates:
+    weight_estimator_chain = get_weight_estimator_chain(verbose=verbose)
+    weight_output: WeightEstimates = await weight_estimator_chain.ainvoke(
+        {"input": recipe.ingredients}
+    )  # type: ignore
+
+    return weight_output
 
 
 async def get_co2_search_emissions(verbose: bool, parsed_rag_emissions: CO2Emissions):
@@ -151,7 +134,8 @@ async def async_estimator(
     try:
         # Estimate weights using weight estimator
         parsed_weight_output = await get_weight_estimates(
-            verbose, translated_recipe, language
+            verbose,
+            translated_recipe,
         )
     except Exception as e:
         print(str(e))
@@ -162,7 +146,6 @@ async def async_estimator(
         parsed_rag_emissions = await get_co2_emissions(
             verbose,
             negligeble_threshold,
-            language,
             parsed_weight_output,
         )
 
@@ -179,6 +162,12 @@ async def async_estimator(
         print(str(e))
         print("Something went wrong when searching for kg CO2e per kg")
         parsed_search_results = []
+
+    # Temporary translation needed here until all runs on english only
+    # for translated_emission, orig_ingredient in zip(
+    #     parsed_rag_emissions.emissions, ingredients_input
+    # ):
+    #     translated_emission.ingredient = orig_ingredient
 
     return generate_output(
         weight_estimates=parsed_weight_output,

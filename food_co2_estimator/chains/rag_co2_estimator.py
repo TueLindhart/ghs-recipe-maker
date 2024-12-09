@@ -1,5 +1,3 @@
-from typing import List
-
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 
 from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions

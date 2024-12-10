@@ -210,8 +210,10 @@ if __name__ == "__main__":
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
     # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
-    url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    # url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
     # url = "https://www.valdemarsro.dk/red-thai-curry/"
+    # url = "https://www.bbcgoodfood.com/recipes/best-spaghetti-bolognese-recipe"
+    url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

@@ -12,7 +12,6 @@ def get_search_co2_emission_chain(verbose: bool):
 
     llm = get_model(
         pydantic_model=CO2SearchResults,
-        model_name="gpt-4o-mini",
         verbose=verbose,
     )
 

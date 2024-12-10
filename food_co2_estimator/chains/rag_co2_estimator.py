@@ -12,7 +12,6 @@ def rag_co2_emission_chain(verbose: bool) -> RunnableSerializable:
 
     llm = get_model(
         pydantic_model=CO2Emissions,
-        model_name="gpt-4o-mini",
         verbose=verbose,
     )
 

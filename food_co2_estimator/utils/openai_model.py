@@ -3,7 +3,7 @@ from typing import Any
 
 from langchain_openai import ChatOpenAI
 
-DEFAULT_MODEL = "gpt-3.5-turbo-16k"
+DEFAULT_MODEL = "gpt-4o-mini"
 
 
 def get_model_name_from_env() -> str:

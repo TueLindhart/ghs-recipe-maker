@@ -201,6 +201,7 @@ if __name__ == "__main__":
     # url = "https://www.bbcgoodfood.com/recipes/best-spaghetti-bolognese-recipe"
     # url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
     # url = "https://gourministeriet.dk/vores-favorit-bolognese/"
+    url = "https://hot-thai-kitchen.com/green-curry-new-2/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

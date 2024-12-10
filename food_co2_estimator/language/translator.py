@@ -1,5 +1,6 @@
 import logging
 import os
+from copy import deepcopy
 from enum import Enum
 from typing import List, Protocol, TypedDict
 
@@ -7,7 +8,7 @@ from deep_translator import GoogleTranslator
 from translate import Translator
 
 from food_co2_estimator.language.detector import Languages
-from food_co2_estimator.output_parsers.recipe_extractor import Recipe
+from food_co2_estimator.output_parsers.recipe_extractor import EnrichedRecipe
 
 # Global cache to keep track of the translator index
 _translation_cache = {"index": 0}
@@ -75,11 +76,11 @@ class MyTranslator:
 
 
 class TranslateDict(TypedDict):
-    recipe: Recipe
+    recipe: EnrichedRecipe
     language: str
 
 
-def extract_translated_recipe(translation: str, recipe: Recipe):
+def extract_translated_recipe(translation: str, recipe: EnrichedRecipe):
 
     if recipe.instructions is not None:
         ingredients_str, instructions = translation.split(INSTRUCTIONS_DELIMITER)
@@ -88,18 +89,22 @@ def extract_translated_recipe(translation: str, recipe: Recipe):
         instructions = None
 
     ingredients = ingredients_str.split(SPLIT_STRING)
-    return Recipe(
-        ingredients=ingredients,
-        persons=recipe.persons,
-        instructions=instructions,
-    )
+    recipe = deepcopy(recipe)
+    recipe.update_with_translations(ingredients, instructions)
+    return recipe
 
 
-def _translate_if_not_english(recipe: Recipe, language: str):
+def _translate_if_not_english(recipe: EnrichedRecipe, language: str):
     if language == "en":
+        recipe.update_with_translations(
+            translated_ingredients=recipe.get_ingredients_orig_name_list(),
+            instructions=recipe.instructions,
+        )
         return recipe
 
-    inputs_str = SPLIT_STRING.join(recipe.ingredients)
+    inputs_str = SPLIT_STRING.join(
+        [ingredient.original_name for ingredient in recipe.ingredients]
+    )
     if recipe.instructions is not None:
         inputs_str += INSTRUCTIONS_DELIMITER + recipe.instructions
     my_translator = MyTranslator.default()

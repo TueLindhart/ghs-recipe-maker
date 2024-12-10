@@ -5,9 +5,9 @@ from langchain.prompts import (
     SystemMessagePromptTemplate,
 )
 
-from food_co2_estimator.output_parsers.recipe_extractor import Recipe
+from food_co2_estimator.output_parsers.recipe_extractor import ExtractedRecipe
 
-WEBSITE_RESPONSE_OBJ = Recipe(
+WEBSITE_RESPONSE_OBJ = ExtractedRecipe(
     ingredients=[
         "500 gram torskefilet",
         "1 tsk havsalt",
@@ -36,7 +36,7 @@ WEBSITE_RESPONSE_OBJ = Recipe(
 )
 WEBSITE_RESPONSE = WEBSITE_RESPONSE_OBJ.model_dump_json()
 
-RAW_TEXT_RESPONSE_OBJ = Recipe(
+RAW_TEXT_RESPONSE_OBJ = ExtractedRecipe(
     ingredients=[
         "1 tomat",
         "2 løg",
@@ -49,7 +49,7 @@ RAW_TEXT_RESPONSE_OBJ = Recipe(
 )
 RAW_TEXT_RESPONSE = RAW_TEXT_RESPONSE_OBJ.model_dump_json()
 
-NO_RECIPE_RESPONSE_OBJ = Recipe(
+NO_RECIPE_RESPONSE_OBJ = ExtractedRecipe(
     ingredients=[],
     persons=None,
     instructions=None,

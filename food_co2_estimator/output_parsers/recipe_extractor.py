@@ -1,11 +1,9 @@
-from dis import Instruction
-from enum import Enum
 from typing import List
 
-from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 
 from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions, CO2perKg
+from food_co2_estimator.output_parsers.search_co2_estimator import CO2SearchResult
 from food_co2_estimator.output_parsers.weight_estimator import (
     WeightEstimate,
     WeightEstimates,
@@ -26,36 +24,40 @@ class ExtractedRecipe(BaseModel):
     )
 
 
-class CO2Source(Enum):
-    DB = "DB"
-    Search = "Search"
-
-
 class EnrichedIngredient(BaseModel):
     original_name: str
-    name: str | None = None
-    weight_in_kg: float | None = None
-    co2_per_kg: float | None = None
-    co2_source: CO2Source | None = None
+    en_name: str | None = None
+    weight_estimate: WeightEstimate | None = None
+    co2_per_kg_db: CO2perKg | None = None
+    co2_per_kg_search: CO2SearchResult | None = None
 
     def is_name_match(self, name: str) -> bool:
-        return self.name == name
+        return self.en_name == name
 
     def set_english_name(self, english_name: str):
-        self.english_name = english_name
+        self.en_name = english_name
 
-    def set_weight(self, weight_estimate: WeightEstimate):
-        if self.name == weight_estimate.ingredient:
-            self.weight_in_kg = weight_estimate.weight_in_kg
+    def set_weight_estimate(self, weight_estimate: WeightEstimate):
+        if self.en_name == weight_estimate.ingredient:
+            self.weight_estimate = weight_estimate
 
-    def set_co2(self, co2_emission: CO2perKg, source: CO2Source):
-        if self.name == co2_emission:
-            self.co2_per_kg = co2_emission.co2_per_kg
-            self.co2_source = source
+    def set_co2_per_kg_db(self, co2_per_kg: CO2perKg):
+        if self.en_name == co2_per_kg.ingredient:
+            self.co2_per_kg_db = co2_per_kg
+
+    def set_co2_per_kg_search(self, co2_per_kg_search: CO2SearchResult):
+        if self.en_name == co2_per_kg_search.ingredient:
+            self.co2_per_kg_search = co2_per_kg_search
 
 
 class EnrichedRecipe(ExtractedRecipe):
     ingredients: list[EnrichedIngredient]
+
+    def get_ingredients_en_name_list(self) -> list[str | None]:
+        return [ingredient.en_name for ingredient in self.ingredients]
+
+    def get_ingredients_orig_name_list(self) -> list[str]:
+        return [ingredient.original_name for ingredient in self.ingredients]
 
     @classmethod
     def from_extracted_recipe(
@@ -71,14 +73,16 @@ class EnrichedRecipe(ExtractedRecipe):
             instructions=extracted_recipe.instructions,
         )
 
-    def get_matched_ingredient(self, name: str):
+    def get_match_object(self, obj: WeightEstimate | CO2perKg | CO2SearchResult):
         for ingredient in self.ingredients:
-            if ingredient.name == name:
+            if ingredient.en_name == obj.ingredient:
                 return ingredient
 
     def update_with_translations(
         self, translated_ingredients: list[str], instructions: str | None
     ):
+
+        self.instructions = instructions
 
         if len(translated_ingredients) != len(self.ingredients):
             translated_ingredients = [
@@ -90,7 +94,18 @@ class EnrichedRecipe(ExtractedRecipe):
 
     def update_with_weight_estimates(self, weight_estimates: WeightEstimates):
         for weight_estimate in weight_estimates.weight_estimates:
-            ingredient = self.get_matched_ingredient(weight_estimate.ingredient)
-            ingredient.set_weight(weight_estimate)
+            ingredient = self.get_match_object(weight_estimate)
+            if ingredient is not None:
+                ingredient.set_weight_estimate(weight_estimate)
 
-    # def enrich_with_weight_estimates(self,weight_estimates: WeightEstimates)
+    def update_with_co2_per_kg_db(self, co2_emissions: CO2Emissions):
+        for co2_per_kg in co2_emissions.emissions:
+            ingredient = self.get_match_object(co2_per_kg)
+            if ingredient is not None:
+                ingredient.set_co2_per_kg_db(co2_per_kg)
+
+    def update_with_co2_per_kg_search(self, co2_emissions: list[CO2SearchResult]):
+        for co2_per_kg in co2_emissions:
+            ingredient = self.get_match_object(co2_per_kg)
+            if ingredient is not None:
+                ingredient.set_co2_per_kg_search(co2_per_kg)

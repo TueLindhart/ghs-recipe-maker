@@ -1,5 +1,6 @@
 import logging
 import os
+from copy import deepcopy
 from enum import Enum
 from typing import List, Protocol, TypedDict
 
@@ -7,6 +8,7 @@ from deep_translator import GoogleTranslator
 from translate import Translator
 
 from food_co2_estimator.language.detector import Languages
+from food_co2_estimator.output_parsers.recipe_extractor import EnrichedRecipe
 
 # Global cache to keep track of the translator index
 _translation_cache = {"index": 0}
@@ -25,6 +27,7 @@ class TranslationProviders(Enum):
 
 SPLIT_STRING = "; "
 N_RETRIES = 2
+INSTRUCTIONS_DELIMITER = " \\ "
 
 
 class MyTranslator:
@@ -73,15 +76,37 @@ class MyTranslator:
 
 
 class TranslateDict(TypedDict):
-    inputs: List[str]
+    recipe: EnrichedRecipe
     language: str
 
 
-def _translate_if_danish(inputs: List[str], language: str):
-    if language == "en":
-        return inputs
+def extract_translated_recipe(translation: str, recipe: EnrichedRecipe):
 
-    inputs_str = SPLIT_STRING.join(inputs)
+    if recipe.instructions is not None:
+        ingredients_str, instructions = translation.split(INSTRUCTIONS_DELIMITER)
+    else:
+        ingredients_str = translation
+        instructions = None
+
+    ingredients = ingredients_str.split(SPLIT_STRING)
+    recipe = deepcopy(recipe)
+    recipe.update_with_translations(ingredients, instructions)
+    return recipe
+
+
+def _translate_if_not_english(recipe: EnrichedRecipe, language: str):
+    if language == "en":
+        recipe.update_with_translations(
+            translated_ingredients=recipe.get_ingredients_orig_name_list(),
+            instructions=recipe.instructions,
+        )
+        return recipe
+
+    inputs_str = SPLIT_STRING.join(
+        [ingredient.original_name for ingredient in recipe.ingredients]
+    )
+    if recipe.instructions is not None:
+        inputs_str += INSTRUCTIONS_DELIMITER + recipe.instructions
     my_translator = MyTranslator.default()
 
     # Retrieve the current index from the global cache
@@ -89,10 +114,11 @@ def _translate_if_danish(inputs: List[str], language: str):
     my_translator.switch_translator(index)
 
     for tries in range(N_RETRIES):
-        translations = my_translator.translate(inputs_str)
-        translation_list = translations.split(SPLIT_STRING)
-        if len(inputs) == len(translation_list):
-            return translation_list
+        translation = my_translator.translate(inputs_str)
+        translated_recipe = extract_translated_recipe(translation, recipe)
+
+        if len(recipe.ingredients) == len(translated_recipe.ingredients):
+            return translated_recipe
 
         logging.warning(
             f"Translation failed. Trying other provider. Retry {tries + 1}/{N_RETRIES}"
@@ -102,8 +128,8 @@ def _translate_if_danish(inputs: List[str], language: str):
         _translation_cache["index"] = index
         my_translator.switch_translator(index)
 
-    return translation_list
+    return translated_recipe
 
 
-def translate_if_danish(input: TranslateDict):
-    return _translate_if_danish(inputs=input["inputs"], language=input["language"])
+def translate_if_not_english(input: TranslateDict):
+    return _translate_if_not_english(recipe=input["recipe"], language=input["language"])

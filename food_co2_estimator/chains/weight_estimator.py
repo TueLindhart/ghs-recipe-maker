@@ -1,23 +1,12 @@
-from langchain.chains.llm import LLMChain
-
-from food_co2_estimator.language.detector import Languages
-from food_co2_estimator.prompt_templates.weight_estimator import (
-    DK_WEIGHT_EST_PROMPT,
-    EN_WEIGHT_EST_PROMPT,
-)
+from food_co2_estimator.output_parsers.weight_estimator import WeightEstimates
+from food_co2_estimator.prompt_templates.weight_estimator import WEIGHT_EST_PROMPT
 from food_co2_estimator.utils.openai_model import get_model
 
 
-def get_weight_estimator_chain(language: Languages, verbose: bool = False):
+def get_weight_estimator_chain(verbose: bool = False):
 
-    en_weight_est_chain = LLMChain(
-        llm=get_model(),
-        prompt=(
-            EN_WEIGHT_EST_PROMPT
-            if language == Languages.English
-            else DK_WEIGHT_EST_PROMPT
-        ),
-        verbose=verbose,
+    llm = get_model(
+        model_name="gpt-4o-mini", pydantic_model=WeightEstimates, verbose=verbose
     )
 
-    return en_weight_est_chain
+    return WEIGHT_EST_PROMPT | llm

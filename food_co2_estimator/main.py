@@ -12,15 +12,17 @@ from food_co2_estimator.chains.translator import get_translation_chain
 from food_co2_estimator.chains.weight_estimator import get_weight_estimator_chain
 from food_co2_estimator.language.detector import Languages, detect_language
 from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions
-from food_co2_estimator.output_parsers.recipe_extractor import Recipe
+from food_co2_estimator.output_parsers.recipe_extractor import (
+    EnrichedIngredient,
+    EnrichedRecipe,
+    ExtractedRecipe,
+)
 from food_co2_estimator.output_parsers.retry_parser import get_retry_parser
 from food_co2_estimator.output_parsers.search_co2_estimator import (
+    CO2SearchResult,
     search_co2_output_parser,
 )
-from food_co2_estimator.output_parsers.weight_estimator import (
-    WeightEstimates,
-    weight_output_parser,
-)
+from food_co2_estimator.output_parsers.weight_estimator import WeightEstimates
 from food_co2_estimator.utils import generate_output, get_url_text
 
 NUMBER_PERSONS_REGEX = r".*\?antal=(\d+)"
@@ -29,32 +31,36 @@ NUMBER_PERSONS_REGEX = r".*\?antal=(\d+)"
 async def get_co2_emissions(
     verbose: bool,
     negligeble_threshold: float,
-    language: Languages,
-    parsed_weight_output: WeightEstimates,
+    recipe: EnrichedRecipe,
 ) -> CO2Emissions:
     emission_chain = rag_co2_emission_chain(verbose)
-    translation_chain = get_translation_chain()
+
     ingredients_input = [
-        item.ingredient
-        for item in parsed_weight_output.weight_estimates
-        if item.weight_in_kg is not None and item.weight_in_kg >= negligeble_threshold
+        item.en_name
+        for item in recipe.ingredients
+        if weight_above_negligeble_threshold(item, negligeble_threshold)
     ]
-    # Translation specific to emission chain is temporary
-    emission_chain_with_translation = translation_chain | emission_chain
-    parsed_rag_emissions: CO2Emissions = await emission_chain_with_translation.ainvoke(
-        input={"inputs": ingredients_input, "language": language.value}
-    )
-    # Temporary translation needed here until all runs on english only
-    for translated_emission, orig_ingredient in zip(
-        parsed_rag_emissions.emissions, ingredients_input
-    ):
-        translated_emission.ingredient = orig_ingredient
+
+    parsed_rag_emissions: CO2Emissions = await emission_chain.ainvoke(ingredients_input)
+
     return parsed_rag_emissions
 
 
-async def extract_recipe(text: str, url: str, is_url: bool, verbose: bool) -> Recipe:
+def weight_above_negligeble_threshold(
+    item: EnrichedIngredient, negligeble_threshold: float
+) -> bool:
+    return (
+        item.weight_estimate is not None
+        and item.weight_estimate.weight_in_kg is not None
+        and item.weight_estimate.weight_in_kg >= negligeble_threshold
+    )
+
+
+async def extract_recipe(
+    text: str, url: str, is_url: bool, verbose: bool
+) -> ExtractedRecipe:
     recipe_extractor_chain = get_recipe_extractor_chain(verbose=verbose)
-    recipe: Recipe = await recipe_extractor_chain.ainvoke({"input": text})
+    recipe: ExtractedRecipe = await recipe_extractor_chain.ainvoke({"input": text})
 
     # If number is provided in url, then use that instead of llm estimate
     if is_url:
@@ -78,34 +84,32 @@ def get_text_from_input(url: str) -> Tuple[bool, str]:
 
 
 async def get_weight_estimates(
-    verbose: bool, recipe: Recipe, language: Languages
+    verbose: bool, recipe: EnrichedRecipe
 ) -> WeightEstimates:
-    weight_estimator_chain = get_weight_estimator_chain(
-        language=language, verbose=verbose
-    )
-    output = await weight_estimator_chain.ainvoke({"input": recipe.ingredients})
-    weight_output = output["text"]
-    try:
-        parsed_weight_output: WeightEstimates = weight_output_parser.parse(
-            weight_output
-        )
-    except OutputParserException:
-        retry_parser = get_retry_parser(weight_output_parser)
-        parsed_weight_output: WeightEstimates = retry_parser.parse(weight_output)
-    return parsed_weight_output
+    weight_estimator_chain = get_weight_estimator_chain(verbose=verbose)
+    weight_output: WeightEstimates = await weight_estimator_chain.ainvoke(
+        {"input": recipe.get_ingredients_en_name_list()}
+    )  # type: ignore
+
+    return weight_output
 
 
-async def get_co2_search_emissions(verbose: bool, parsed_rag_emissions: CO2Emissions):
+async def get_co2_search_emissions(
+    verbose: bool,
+    recipe: EnrichedRecipe,
+    negligeble_threshold: float,
+) -> list[CO2SearchResult]:
     co2_search_input_items = [
-        item.ingredient
-        for item in parsed_rag_emissions.emissions
-        if item.co2_per_kg is None
+        item.en_name
+        for item in recipe.ingredients
+        if co2_per_kg_not_found(item)
+        and weight_above_negligeble_threshold(item, negligeble_threshold)
     ]
     search_agent = get_co2_google_search_agent(verbose=verbose)
     tasks = [search_agent.ainvoke({"input": q}) for q in co2_search_input_items]
     search_results = await asyncio.gather(*tasks)
-    parsed_search_results = []
 
+    parsed_search_results = []
     for result in search_results:
         try:
             parsed_search_results.append(
@@ -114,7 +118,12 @@ async def get_co2_search_emissions(verbose: bool, parsed_rag_emissions: CO2Emiss
         except OutputParserException:
             retry_parser = get_retry_parser(search_co2_output_parser)
             parsed_search_results.append(retry_parser.parse(result["output"]))
+
     return parsed_search_results
+
+
+def co2_per_kg_not_found(item: EnrichedIngredient):
+    return item.co2_per_kg_db is None or item.co2_per_kg_db.co2_per_kg is None
 
 
 # TO-DO: Implement Runnable Interface instead and set prompttemplaces outside of model calls
@@ -127,21 +136,35 @@ async def async_estimator(
 
     # Extract ingredients from text
     recipe = await extract_recipe(text=text, url=url, is_url=is_url, verbose=verbose)
-
     if len(recipe.ingredients) == 0:
         if is_url:
             return "I can't find a recipe in the provided URL. Try manually inserting ingredients list"
         return "Cannot find any ingredients"
 
     # Detect language in ingredients
-    language = detect_language(recipe)
+    enriched_recipe = EnrichedRecipe.from_extracted_recipe(recipe)
+    language = detect_language(enriched_recipe)
     if language is None:
         return (
             f"Language is not recognized as {', '.join([l.value for l in Languages])}"
         )
+
+    translator = get_translation_chain()
+    try:
+        enriched_recipe: EnrichedRecipe = await translator.ainvoke(
+            {"recipe": enriched_recipe, "language": language}
+        )
+    except Exception as e:
+        print(str(e))
+        return "Something went wrong in translating recipies."
+
     try:
         # Estimate weights using weight estimator
-        parsed_weight_output = await get_weight_estimates(verbose, recipe, language)
+        parsed_weight_output = await get_weight_estimates(
+            verbose,
+            enriched_recipe,
+        )
+        enriched_recipe.update_with_weight_estimates(parsed_weight_output)
     except Exception as e:
         print(str(e))
         return "Something went wrong in estimating weights of ingredients."
@@ -151,9 +174,9 @@ async def async_estimator(
         parsed_rag_emissions = await get_co2_emissions(
             verbose,
             negligeble_threshold,
-            language,
-            parsed_weight_output,
+            enriched_recipe,
         )
+        enriched_recipe.update_with_co2_per_kg_db(parsed_rag_emissions)
 
     except Exception as e:
         print(str(e))
@@ -162,17 +185,16 @@ async def async_estimator(
     # Check if any ingredients needs CO2 search
     try:
         parsed_search_results = await get_co2_search_emissions(
-            verbose, parsed_rag_emissions
+            verbose, enriched_recipe, negligeble_threshold
         )
+        enriched_recipe.update_with_co2_per_kg_search(parsed_search_results)
     except Exception as e:
         print(str(e))
         print("Something went wrong when searching for kg CO2e per kg")
         parsed_search_results = []
 
     return generate_output(
-        weight_estimates=parsed_weight_output,
-        co2_emissions=parsed_rag_emissions,
-        search_results=parsed_search_results,
+        enriched_recipe=enriched_recipe,
         negligeble_threshold=negligeble_threshold,
         number_of_persons=recipe.persons,
         language=language,
@@ -187,9 +209,11 @@ if __name__ == "__main__":
     start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
-    url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
+    # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
     # url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
     # url = "https://www.valdemarsro.dk/red-thai-curry/"
+    # url = "https://www.bbcgoodfood.com/recipes/best-spaghetti-bolognese-recipe"
+    url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

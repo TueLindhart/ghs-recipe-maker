@@ -5,7 +5,7 @@ from langchain.prompts import (
     SystemMessagePromptTemplate,
 )
 
-from food_co2_estimator.output_parsers.recipe_extractor import ExtractedRecipe
+from food_co2_estimator.pydantic_models.recipe_extractor import ExtractedRecipe
 
 WEBSITE_RESPONSE_OBJ = ExtractedRecipe(
     ingredients=[

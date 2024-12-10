@@ -5,7 +5,7 @@ from langchain.prompts import (
     SystemMessagePromptTemplate,
 )
 
-from food_co2_estimator.output_parsers.weight_estimator import (
+from food_co2_estimator.pydantic_models.weight_estimator import (
     WeightEstimate,
     WeightEstimates,
 )

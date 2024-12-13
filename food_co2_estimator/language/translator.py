@@ -27,7 +27,7 @@ class TranslationProviders(Enum):
 
 SPLIT_STRING = "; "
 N_RETRIES = 2
-INSTRUCTIONS_DELIMITER = " \\ "
+INSTRUCTIONS_DELIMITER = "----"
 
 
 class MyTranslator:

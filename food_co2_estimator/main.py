@@ -182,7 +182,7 @@ async def async_estimator(
     return generate_output(
         enriched_recipe=enriched_recipe,
         negligeble_threshold=negligeble_threshold,
-        number_of_persons=recipe.persons,
+        number_of_persons=enriched_recipe.persons,
         language=language,
     )
 
@@ -196,12 +196,13 @@ if __name__ == "__main__":
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
     # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
-    url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    # url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    url = "https://www.valdemarsro.dk/greasy-portobello-burger-med-boenneboef/"
     # url = "https://www.valdemarsro.dk/red-thai-curry/"
     # url = "https://www.bbcgoodfood.com/recipes/best-spaghetti-bolognese-recipe"
     # url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
     # url = "https://gourministeriet.dk/vores-favorit-bolognese/"
-    url = "https://hot-thai-kitchen.com/green-curry-new-2/"
+    # url = "https://hot-thai-kitchen.com/green-curry-new-2/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

@@ -2,7 +2,7 @@ from enum import Enum
 
 from langdetect import detect
 
-from food_co2_estimator.output_parsers.recipe_extractor import EnrichedRecipe
+from food_co2_estimator.pydantic_models.recipe_extractor import EnrichedRecipe
 
 
 class Languages(Enum):

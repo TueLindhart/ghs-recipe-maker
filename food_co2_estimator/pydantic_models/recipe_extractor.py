@@ -2,9 +2,12 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions, CO2perKg
-from food_co2_estimator.output_parsers.search_co2_estimator import CO2SearchResult
-from food_co2_estimator.output_parsers.weight_estimator import (
+from food_co2_estimator.pydantic_models.co2_estimator import CO2Emissions, CO2perKg
+from food_co2_estimator.pydantic_models.search_co2_estimator import (
+    CO2SearchResult,
+    CO2SearchResults,
+)
+from food_co2_estimator.pydantic_models.weight_estimator import (
     WeightEstimate,
     WeightEstimates,
 )
@@ -104,8 +107,8 @@ class EnrichedRecipe(ExtractedRecipe):
             if ingredient is not None:
                 ingredient.set_co2_per_kg_db(co2_per_kg)
 
-    def update_with_co2_per_kg_search(self, co2_emissions: list[CO2SearchResult]):
-        for co2_per_kg in co2_emissions:
+    def update_with_co2_per_kg_search(self, co2_emissions: CO2SearchResults):
+        for co2_per_kg in co2_emissions.search_results:
             ingredient = self.get_match_object(co2_per_kg)
             if ingredient is not None:
                 ingredient.set_co2_per_kg_search(co2_per_kg)

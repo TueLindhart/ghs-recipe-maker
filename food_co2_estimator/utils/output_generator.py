@@ -1,5 +1,5 @@
 from food_co2_estimator.language.detector import Languages
-from food_co2_estimator.output_parsers.recipe_extractor import EnrichedRecipe
+from food_co2_estimator.pydantic_models.recipe_extractor import EnrichedRecipe
 
 # Avg. dinner emission per person method:
 # 1. Get Food emission per person per year here: https://concito.dk/udgivelser/danmarks-globale-forbrugsudledninger which is 1.97 ton / per capita

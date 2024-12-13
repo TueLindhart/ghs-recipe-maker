@@ -3,26 +3,21 @@ import re
 from typing import Tuple
 
 import validators
-from langchain.schema.output_parser import OutputParserException
 
-from food_co2_estimator.agent.search_agent import get_co2_google_search_agent
 from food_co2_estimator.chains.rag_co2_estimator import rag_co2_emission_chain
 from food_co2_estimator.chains.recipe_extractor import get_recipe_extractor_chain
+from food_co2_estimator.chains.search_co2_estimator import get_search_co2_emission_chain
 from food_co2_estimator.chains.translator import get_translation_chain
 from food_co2_estimator.chains.weight_estimator import get_weight_estimator_chain
 from food_co2_estimator.language.detector import Languages, detect_language
-from food_co2_estimator.output_parsers.co2_estimator import CO2Emissions
-from food_co2_estimator.output_parsers.recipe_extractor import (
+from food_co2_estimator.pydantic_models.co2_estimator import CO2Emissions
+from food_co2_estimator.pydantic_models.recipe_extractor import (
     EnrichedIngredient,
     EnrichedRecipe,
     ExtractedRecipe,
 )
-from food_co2_estimator.output_parsers.retry_parser import get_retry_parser
-from food_co2_estimator.output_parsers.search_co2_estimator import (
-    CO2SearchResult,
-    search_co2_output_parser,
-)
-from food_co2_estimator.output_parsers.weight_estimator import WeightEstimates
+from food_co2_estimator.pydantic_models.search_co2_estimator import CO2SearchResults
+from food_co2_estimator.pydantic_models.weight_estimator import WeightEstimates
 from food_co2_estimator.utils import generate_output, get_url_text
 
 NUMBER_PERSONS_REGEX = r".*\?antal=(\d+)"
@@ -98,35 +93,27 @@ async def get_co2_search_emissions(
     verbose: bool,
     recipe: EnrichedRecipe,
     negligeble_threshold: float,
-) -> list[CO2SearchResult]:
+) -> CO2SearchResults:
     co2_search_input_items = [
         item.en_name
         for item in recipe.ingredients
         if co2_per_kg_not_found(item)
         and weight_above_negligeble_threshold(item, negligeble_threshold)
+        and item.en_name is not None
     ]
-    search_agent = get_co2_google_search_agent(verbose=verbose)
-    tasks = [search_agent.ainvoke({"input": q}) for q in co2_search_input_items]
-    search_results = await asyncio.gather(*tasks)
-
-    parsed_search_results = []
-    for result in search_results:
-        try:
-            parsed_search_results.append(
-                search_co2_output_parser.parse(result["output"])
-            )
-        except OutputParserException:
-            retry_parser = get_retry_parser(search_co2_output_parser)
-            parsed_search_results.append(retry_parser.parse(result["output"]))
-
-    return parsed_search_results
+    if not co2_search_input_items:
+        return CO2SearchResults(search_results=[])
+    search_chain = get_search_co2_emission_chain(verbose=verbose)
+    search_results: CO2SearchResults = await search_chain.ainvoke(
+        co2_search_input_items
+    )  # type: ignore
+    return search_results
 
 
 def co2_per_kg_not_found(item: EnrichedIngredient):
     return item.co2_per_kg_db is None or item.co2_per_kg_db.co2_per_kg is None
 
 
-# TO-DO: Implement Runnable Interface instead and set prompttemplaces outside of model calls
 async def async_estimator(
     url: str,
     verbose: bool = False,
@@ -191,12 +178,11 @@ async def async_estimator(
     except Exception as e:
         print(str(e))
         print("Something went wrong when searching for kg CO2e per kg")
-        parsed_search_results = []
 
     return generate_output(
         enriched_recipe=enriched_recipe,
         negligeble_threshold=negligeble_threshold,
-        number_of_persons=recipe.persons,
+        number_of_persons=enriched_recipe.persons,
         language=language,
     )
 
@@ -211,9 +197,12 @@ if __name__ == "__main__":
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
     # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
     # url = "https://www.valdemarsro.dk/hjemmelavede-burgere/"
+    url = "https://www.valdemarsro.dk/greasy-portobello-burger-med-boenneboef/"
     # url = "https://www.valdemarsro.dk/red-thai-curry/"
     # url = "https://www.bbcgoodfood.com/recipes/best-spaghetti-bolognese-recipe"
-    url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
+    # url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
+    # url = "https://gourministeriet.dk/vores-favorit-bolognese/"
+    # url = "https://hot-thai-kitchen.com/green-curry-new-2/"
     # url = """1 stk tomat
     #          1 glas oliven
     #          200 g løg

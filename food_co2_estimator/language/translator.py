@@ -8,7 +8,7 @@ from deep_translator import GoogleTranslator
 from translate import Translator
 
 from food_co2_estimator.language.detector import Languages
-from food_co2_estimator.output_parsers.recipe_extractor import EnrichedRecipe
+from food_co2_estimator.pydantic_models.recipe_extractor import EnrichedRecipe
 
 # Global cache to keep track of the translator index
 _translation_cache = {"index": 0}
@@ -27,7 +27,7 @@ class TranslationProviders(Enum):
 
 SPLIT_STRING = "; "
 N_RETRIES = 2
-INSTRUCTIONS_DELIMITER = " \\ "
+INSTRUCTIONS_DELIMITER = "----"
 
 
 class MyTranslator:

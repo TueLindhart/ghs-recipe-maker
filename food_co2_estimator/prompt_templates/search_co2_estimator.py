@@ -1,64 +1,72 @@
-SEARCH_AGENT_PROMPT_PREFIX = """
-Given an ingredient in Danish or English as input, find the kg CO2e per kg of the ingredient by using a search tool and extracting the kg CO2e per kg from the search results.
+from langchain_core.prompts import ChatPromptTemplate
 
-If you find multiple values then choose the most likely result based on what type of ingredient it is.
+SEARCH_SYSTEM_PROMPT = """
+You are an expert in extracting CO2 emission estimates (in kg CO2e per kg) from web search results for a list of ingredients.
 
-Here is some information to help you choose the most likely result:
-- Vegetables are usually between 0.1 and 0.5 kg CO2e per kg.
-- Fruits are usually between 0.2-0.8 kg CO2e per kg.
-- Beans and lentils are usually between 0.5-2.0 kg CO2e per kg.
-- Poultry (e.g., chicken) is usually between 3.0-6.0 kg CO2e per kg.
-- Pork is usually between 4.0-7.0 kg CO2e per kg.
-- Beef is usually between 7.0-22.0 kg CO2e per kg.
-- Lamb is usually between 9.0-20.0 kg CO2e per kg.
-- Dairy products are usually between 0.5-12.0 kg CO2e per kg.
+Follow these instructions carefully:
 
-If you can't estimate what value that is most likely, then provide the value closest to the median of the values.
-If you cannot find the kg CO2e per kg of the ingredient, then provide the final answer 'CO2e per kg not found'.
+1. Primary Goal:
+   For each ingredient provided, determine the most likely CO2e emission value per kilogram (kg CO2e/kg) based on the search results.
 
-You have access to the following tools:
+2. Reference Ranges for Common Ingredients (for guidance only, do not output these ranges):
+   - Vegetables: 0.1–0.5 kg CO2e/kg
+   - Fruits: 0.2–0.8 kg CO2e/kg
+   - Beans and Lentils: 0.5–2.0 kg CO2e/kg
+   - Poultry (e.g., chicken): 3.0–6.0 kg CO2e/kg
+   - Pork: 4.0–7.0 kg CO2e/kg
+   - Beef: 7.0–22.0 kg CO2e/kg
+   - Lamb: 9.0–20.0 kg CO2e/kg
+   - Dairy Products: 0.5–12.0 kg CO2e/kg
+
+3. Determining the Most Likely Value for Each Ingredient:
+   - Gather candidate CO2e/kg values from the results.
+   - If multiple plausible values are found:
+     - Select the single value best aligned with the reference range for that ingredient category.
+     - If still uncertain, pick the median of the plausible values.
+   - Do not provide ranges as the final answer. Provide only a single numeric value if possible.
+
+4. If No Suitable Value is Found for an Ingredient:
+   - If no numeric CO2e per kg estimate can be confidently determined, "result" should be null.
+
+5. Output Format (JSON):
+   - You must return an object that matches the CO2SearchResults Pydantic model:
+     {{
+       "search_results": [
+         {{
+           "ingredient": "The first ingredient in the input list",
+           "explanation": "A detailed, step-by-step reasoning of how the final search result was chosen",
+           "unit": "kg CO2e per kg" if a numeric result is found, otherwise null,
+           "result": numeric value if found, else null
+         }},
+         ...
+       ]
+     }}
+
+   - For each ingredient, you must fill one CO2SearchResult object.
+   - "ingredient" must be exactly the original ingredient string from the input list.
+   - "explanation" should describe the reasoning for the chosen value or for why no value could be found.
+   - "unit" should be "kg CO2e per kg" only if a numeric "result" is provided, otherwise null.
+   - "result" should be a single numeric value or null. Do not provide ranges.
+
+Your final response must strictly follow the above structure and formatting.
+
 """
 
-# SEARCH_AGENT_FORMAT_INSTRUCTIONS = """
-# Use the following format:
 
-# Input: the ingredient you must search for
-# Thought: you should always think about what to do
-# Action: the action to take, should be one of [{tool_names}]
-# Action Input: the input to the action
-# Observation: the result of the action
-# ... (this Thought/Action/Action Input/Observation can repeat 1 time)
-# Thought: I now know the final answer
-# Final Answer: the final answer to the original input question.
-# """
-SEARCH_AGENT_FORMAT_INSTRUCTIONS = """
-Use the following format:
+PROMPT_INPUT = """
 
-Input: the ingredient you must search for
-Action: the action to take, can only be {tool_names}
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat 1 time)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question.
+Provided the dictionary with search results for each ingredient, if possible
+provide me with the emission per ingredient
+
+Search results:
+{search_results}
+
+Ingredient list: {ingredients}
 """
 
-SEARCH_AGENT_PROMPT_SUFFIX = """
-
-Before searching for the ingredient, remove amounts and anything else that is not useful in getting kg CO2e per kg results.
-You do NOT need to use a tool for removing amount etc.
-Search on the language provided.
-
-Removal example: 150 g red lentils --> red lentils.
-Search example: red lentils kg CO2e per kg.
-
-You must extract the kg CO2e per kg from the search results.
-Do not provide any ranges for the final search result. For example, do not provide '0.1-0.5 kg CO2e per kg' as the final search result.
-It is very important that you provide your output/answer wrt. to the JSON format below above. Otherwise, your answer is useless.
-Remember the "ingredient" key must be the original input: '{input}'.
-
-Begin!
-
-Input: {input}
-{agent_scratchpad}
-"""
+SEARCH_CO2_EMISSION_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        ("system", SEARCH_SYSTEM_PROMPT),
+        ("human", PROMPT_INPUT),
+    ]
+)

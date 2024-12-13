@@ -1,34 +1,25 @@
-import asyncio
+from langchain_core.runnables import RunnablePassthrough
 
-from langchain.agents import AgentExecutor
-from langchain.tools import tool
-
-
-async def async_search_item(search_agent: AgentExecutor, input: str):
-    return await search_agent.arun(input)
-
-
-def search_item(search_agent: AgentExecutor, input: str):
-    return search_agent.run(input)
+from food_co2_estimator.prompt_templates.search_co2_estimator import (
+    SEARCH_CO2_EMISSION_PROMPT,
+)
+from food_co2_estimator.pydantic_models.search_co2_estimator import CO2SearchResults
+from food_co2_estimator.retrievers.search_retriever import batch_co2_search_retriever
+from food_co2_estimator.utils.openai_model import get_model
 
 
-def get_async_search_agent_tool(search_agent: AgentExecutor):
-    @tool("CO2 search tool", return_direct=False)
-    async def search_multiple_items(inputs: str):
-        """Useful for finding out the kg CO2e / kg for ingredients. Each ingredient must be comma separated in the input."""
+def get_search_co2_emission_chain(verbose: bool):
 
-        tasks = [async_search_item(search_agent=search_agent, input=input) for input in inputs.split(",")]
-        return await asyncio.gather(*tasks)
+    llm = get_model(
+        pydantic_model=CO2SearchResults,
+        verbose=verbose,
+    )
 
-    return search_multiple_items
-
-
-def get_search_agent_tool(search_agent: AgentExecutor):
-    @tool("CO2 search tool", return_direct=False)
-    def search_multiple_items(inputs: str):
-        """Useful for finding out the kg CO2e / kg for ingredients. Each ingredient must be comma separated in the input."""
-
-        results = [search_item(search_agent=search_agent, input=input) for input in inputs.split(",")]
-        return results
-
-    return search_multiple_items
+    return (
+        {
+            "search_results": batch_co2_search_retriever,
+            "ingredients": RunnablePassthrough(),
+        }
+        | SEARCH_CO2_EMISSION_PROMPT
+        | llm
+    )

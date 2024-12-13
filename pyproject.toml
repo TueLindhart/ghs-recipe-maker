@@ -24,6 +24,7 @@ langchain-chroma = "^0.1.4"
 translate = "^3.6.1"
 deep-translator = "^1.11.4"
 tqdm = "^4.67.0"
+poetry-plugin-export = "^1.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

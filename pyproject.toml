@@ -25,6 +25,7 @@ translate = "^3.6.1"
 deep-translator = "^1.11.4"
 tqdm = "^4.67.0"
 poetry-plugin-export = "^1.8.0"
+markdownify = "^0.14.1"
 
 
 [tool.poetry.group.dev.dependencies]

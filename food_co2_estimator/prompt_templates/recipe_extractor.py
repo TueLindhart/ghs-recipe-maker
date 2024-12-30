@@ -60,7 +60,7 @@ EXAMPLE_INPUT_2 = """
 Det er dejligt vejr i dag. Jeg tror jeg vil gå en tur.
 """
 
-system_prompt = """
+SYSTEM_PROMPT = """
 Act as an expert in extracting recipes from text that understand Danish and English.
 Given an unstructured raw text containing a recipe, extract the amount of each ingredient, the number of persons, and the instructions.
 The instructions are the description of how you prepare the meal.
@@ -71,18 +71,16 @@ It is very important that you extract the number of persons (antal personer) fro
 If the instructions are available, then it is important that you also extract the instructions!
 If number of persons are not explicitly mentioned in text, then estimate from the amount of ingredients.
 
-The input/text is delimited by ####.
-
 Begin!
 """
 
 messages = [
-    SystemMessagePromptTemplate.from_template(system_prompt),
-    HumanMessagePromptTemplate.from_template("####{example_input_1}####"),
+    SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template("{example_input_1}"),
     AIMessagePromptTemplate.from_template("{website_response}"),
-    HumanMessagePromptTemplate.from_template("####{example_input_2}####"),
+    HumanMessagePromptTemplate.from_template("{example_input_2}"),
     AIMessagePromptTemplate.from_template("{no_recipe_response}"),
-    HumanMessagePromptTemplate.from_template("####{input}####"),
+    HumanMessagePromptTemplate.from_template("{input}"),
 ]
 
 RECIPE_EXTRACTOR_PROMPT = ChatPromptTemplate(
@@ -91,7 +89,7 @@ RECIPE_EXTRACTOR_PROMPT = ChatPromptTemplate(
     partial_variables={
         "example_input_1": EXAMPLE_INPUT_1,
         "website_response": WEBSITE_RESPONSE,
-        "example_input_3": EXAMPLE_INPUT_2,
+        "example_input_2": EXAMPLE_INPUT_2,
         "no_recipe_response": NO_RECIPE_RESPONSE,
     },
 )

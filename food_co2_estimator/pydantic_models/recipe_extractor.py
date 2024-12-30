@@ -54,6 +54,7 @@ class EnrichedIngredient(BaseModel):
 
 
 class EnrichedRecipe(ExtractedRecipe):
+    url: str
     ingredients: list[EnrichedIngredient]
 
     def get_ingredients_en_name_list(self) -> list[str | None]:
@@ -65,9 +66,11 @@ class EnrichedRecipe(ExtractedRecipe):
     @classmethod
     def from_extracted_recipe(
         cls,
+        url,
         extracted_recipe: ExtractedRecipe,
     ) -> "EnrichedRecipe":
         return cls(
+            url=url,
             ingredients=[
                 EnrichedIngredient(original_name=ingredient)
                 for ingredient in extracted_recipe.ingredients

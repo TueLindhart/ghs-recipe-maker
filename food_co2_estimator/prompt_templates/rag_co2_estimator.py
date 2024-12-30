@@ -56,16 +56,28 @@ Follow these rules to find the best match and extrapolate logically:
    - Search for matches within the provided context.
    - Prioritize options listed in the context when determining the best match.
 
+9. **Use Common Sense for CO2 Emissions**
+   - Use common sense in creating matches wrt. to matching to ingredients with realistic co2 emission matches.
+   - **Example**
+      - It does NOT make sense to match water to milk as the CO2 emission of water and milk is very unlikely to be the same.
+
 **Summary of Decision Process:**
 - **Step 1:** Check for an exact or nearly exact match in the provided context.
 - **Step 2:** If not found, determine if the ingredient falls under a broader category within the context.
 - **Step 3:** Consider the amount of processing; choose the option closest to the ingredient's processing level.
 - **Step 4:** If options have similar processing levels, select the one with the highest emission factor.
 - **Step 5:** If no suitable match is found, leave the CO2 per kg result as 'none'.
+- **Step 6:** Ignore quantity information entirely while making a match.
+- **Step 7:** Account for synonyms, alternative names, or regional variations to find a match.
+- **Step 8:** Use only the provided ingredient emission options to determine the match.
+- **Step 9:** Apply common sense to ensure realistic and logical matches concerning CO2 emissions.
 
 All the above rules aim to ensure the best estimate of CO2 emission per kg for an ingredient.
+"""
 
-These are the ingredient emission options:
+
+RAG_CO2_EMISSION_PROMPT_ASSISTANT = """
+These are the ingredient emission options that must be matched to user input:
 {context}
 """
 
@@ -79,6 +91,7 @@ Begin!
 RAG_CO2_EMISSION_PROMPT = ChatPromptTemplate.from_messages(
     [
         ("system", RAG_CO2_EMISSION_PROMPT_SYSTEM),
+        ("assistant", RAG_CO2_EMISSION_PROMPT_ASSISTANT),
         ("human", RAG_CO2_EMISSION_PROMPT_INPUT_TEMPLATE),
     ]
 )

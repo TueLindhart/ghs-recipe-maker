@@ -165,7 +165,9 @@ async def async_estimator(
     url: str,
     verbose: bool = False,
     negligeble_threshold: float = 0.01,
+    logging_level=logging.INFO,
 ):
+    logging.basicConfig(level=logging_level)
     text = get_markdown_from_url(url)
     if text is None:
         return "Unable to extraxt text from provided URL"
@@ -256,7 +258,6 @@ if __name__ == "__main__":
 
     from time import time
 
-    logging.basicConfig(level=logging.INFO)
     start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
@@ -271,7 +272,9 @@ if __name__ == "__main__":
     url = "https://www.arla.dk/opskrifter/nytarstorsk-bagt-torsk-med-sennepssauce/"
 
     start_time = time()
-    print(asyncio.run(async_estimator(url=url, verbose=True)))
+    print(
+        asyncio.run(async_estimator(url=url, verbose=True, logging_level=logging.INFO))
+    )
     # estimator(url=url, verbose=True)
     end_time = time()
     print(f"Async time elapsed: {end_time - start_time}s")

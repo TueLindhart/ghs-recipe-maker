@@ -4,7 +4,7 @@ import threading
 
 from flask import Flask, jsonify, render_template, request
 
-from food_co2_estimator import async_estimator
+from food_co2_estimator.main import async_estimator
 
 app = Flask(__name__)
 

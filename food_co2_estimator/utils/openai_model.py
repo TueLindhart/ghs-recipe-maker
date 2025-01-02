@@ -1,10 +1,9 @@
 import os
-from typing import Any, Type, TypeVar
+from typing import Any
 
 from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
-
-T = TypeVar("T")
+from pydantic import BaseModel
 
 DEFAULT_MODEL = "gpt-4o-mini"
 
@@ -14,7 +13,7 @@ def get_model_name_from_env() -> str:
 
 
 def get_model(
-    pydantic_model: Type[T] | None = None,
+    pydantic_model: type[BaseModel] | None = None,
     model_name: str | None = None,
     verbose: bool = False,
 ) -> ChatOpenAI | Runnable[Any, Any]:

@@ -7,5 +7,8 @@ lint:
 format:
 	poetry run ruff format
 
+type-check:
+	poetry run pyright
+
 all: install lint-check format
 

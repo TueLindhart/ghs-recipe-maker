@@ -49,7 +49,6 @@ target-version = "py313"
 lint.fixable = ["ALL"]
 
 [tool.pyright]
-include = ["src"]
 exclude = ["**/__pycache__", ".venv"]
 typeCheckingMode = "basic"
 useLibraryCodeForTypes = true

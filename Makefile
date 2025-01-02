@@ -1,7 +1,7 @@
 install:
 	poetry install --with dev --no-root --no-interaction
 
-lint-check:
+lint:
 	poetry run ruff check --fix
 
 format:

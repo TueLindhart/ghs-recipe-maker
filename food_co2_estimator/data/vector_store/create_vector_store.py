@@ -30,7 +30,6 @@ uuids = []
 for id, (emission_record_dk, emission_record_gb) in enumerate(
     tqdm(zip(emission_records_dk, emission_records_gb)), 1
 ):
-
     en_name: str | None = emission_record_gb.get("Name", None)
     if en_name is None:
         logging.warning(f"Object {emission_record_gb} is not added to DB")

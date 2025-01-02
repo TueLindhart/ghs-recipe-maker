@@ -6,7 +6,6 @@ from food_co2_estimator.retrievers.emission_retriever import clean_ingredient_li
 
 
 async def batch_co2_search_retriever(ingredients: list[str]):
-
     search_tool = GoogleSerperAPIWrapper(k=10, gl="dk")
     cleaned_ingredients = clean_ingredient_list(ingredients)
     search_queries = [

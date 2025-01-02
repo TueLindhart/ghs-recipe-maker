@@ -1,0 +1,27 @@
+name: Continuous intregration of Recipe CO2 Estimator app
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.12.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.12.8
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.5
+      - name: Install dependencies
+        run: |
+          make install
+      - name: Check linting
+        run: |
+          make lint
+      - name: Format code
+        run: |
+          make format
+      - name: Run type checking
+        run: |
+          make type-check

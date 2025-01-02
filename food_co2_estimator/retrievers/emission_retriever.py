@@ -136,9 +136,7 @@ def get_clean_regex():
             )
         )+                                        # One or more quantities with optional units
         (?:of\b\s*)?                              # Optional 'of' followed by optional whitespace
-    """.format(
-        units=units_pattern
-    )
+    """.format(units=units_pattern)
 
     # Compile the regex pattern with verbose and ignore case flags
     regex = re.compile(pattern, re.IGNORECASE | re.VERBOSE)

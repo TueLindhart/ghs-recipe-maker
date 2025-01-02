@@ -6,7 +6,7 @@ authors = ["Tue Thomsen"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.13.1"
+python = "3.12.8"
 langchain = "^0.3.4"
 pandas = "^2.0.3"
 langdetect = "^1.0.9"
@@ -26,10 +26,34 @@ deep-translator = "^1.11.4"
 tqdm = "^4.67.0"
 poetry-plugin-export = "^1.8.0"
 markdownify = "^0.14.1"
+make = "^0.1.6.post2"
 
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
+ruff = "^0.8.5"
+pyright = "^1.1.391"
+pytest = "^8.3.4"
+
+[tool.ruff]
+# Exclude files and directories
+exclude = [".git", ".venv", "__pycache__", "*.ipynb"]
+
+# Line length
+line-length = 88
+
+# Python target version
+target-version = "py313"
+
+# Enable auto-fixes
+lint.fixable = ["ALL"]
+
+[tool.pyright]
+exclude = ["**/__pycache__", ".venv"]
+typeCheckingMode = "basic"
+useLibraryCodeForTypes = true
+reportMissingTypeStubs = false
+reportUnknownVariableType = false
 
 [build-system]
 requires = ["poetry-core"]

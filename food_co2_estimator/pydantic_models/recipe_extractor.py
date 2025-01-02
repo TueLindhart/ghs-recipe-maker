@@ -87,7 +87,6 @@ class EnrichedRecipe(ExtractedRecipe):
     def update_with_translations(
         self, translated_ingredients: list[str], instructions: str | None
     ):
-
         self.instructions = instructions
 
         if len(translated_ingredients) != len(self.ingredients):

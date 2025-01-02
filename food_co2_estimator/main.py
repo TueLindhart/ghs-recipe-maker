@@ -254,7 +254,6 @@ async def async_estimator(
 
 
 if __name__ == "__main__":
-    # import asyncio
 
     from time import time
 

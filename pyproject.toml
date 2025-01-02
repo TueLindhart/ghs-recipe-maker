@@ -26,10 +26,34 @@ deep-translator = "^1.11.4"
 tqdm = "^4.67.0"
 poetry-plugin-export = "^1.8.0"
 markdownify = "^0.14.1"
+make = "^0.1.6.post2"
 
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
+ruff = "^0.8.5"
+pyright = "^1.1.391"
+pytest = "^8.3.4"
+
+[tool.ruff]
+# Exclude files and directories
+exclude = [".git", ".venv", "__pycache__"]
+
+# Line length
+line-length = 88
+
+# Python target version
+target-version = "py313"
+
+# Enable auto-fixes
+fixable = ["ALL"]
+
+[tool.pyright]
+include = ["src"]
+exclude = ["**/__pycache__", ".venv"]
+typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
+reportMissingTypeStubs = false
 
 [build-system]
 requires = ["poetry-core"]

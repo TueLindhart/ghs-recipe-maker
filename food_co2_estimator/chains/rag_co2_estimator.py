@@ -9,7 +9,6 @@ from food_co2_estimator.utils.openai_model import get_model
 
 
 def rag_co2_emission_chain(verbose: bool) -> RunnableSerializable:
-
     llm = get_model(
         pydantic_model=CO2Emissions,
         verbose=verbose,

@@ -9,7 +9,6 @@ from food_co2_estimator.utils.openai_model import get_model
 
 
 def get_search_co2_emission_chain(verbose: bool):
-
     llm = get_model(
         pydantic_model=CO2SearchResults,
         verbose=verbose,

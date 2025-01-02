@@ -16,7 +16,6 @@ ALLOWED_LANGUAGE_MISTAKES = [Languages.Norwegian.value, Languages.Swedish.value]
 
 
 def detect_language(recipe: EnrichedRecipe) -> Languages | None:
-
     language = (
         detect(recipe.instructions)
         if recipe.instructions is not None

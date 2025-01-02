@@ -175,7 +175,6 @@ async def async_estimator(
     # Extract ingredients from text
     recipe = await extract_recipe(text=text, url=url, verbose=verbose)
     if len(recipe.ingredients) == 0:
-
         no_recipe_message = "I can't find a recipe in the provided URL."
         log_expeption_message(url, no_recipe_message)
         return no_recipe_message
@@ -190,7 +189,6 @@ async def async_estimator(
 
     translator = get_translation_chain()
     try:
-
         enriched_recipe: EnrichedRecipe = await translator.ainvoke(
             {"recipe": enriched_recipe, "language": language}
         )
@@ -254,7 +252,6 @@ async def async_estimator(
 
 
 if __name__ == "__main__":
-
     from time import time
 
     start_time = time()

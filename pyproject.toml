@@ -37,7 +37,7 @@ pytest = "^8.3.4"
 
 [tool.ruff]
 # Exclude files and directories
-exclude = [".git", ".venv", "__pycache__"]
+exclude = [".git", ".venv", "__pycache__", "*.ipynb"]
 
 # Line length
 line-length = 88
@@ -46,7 +46,7 @@ line-length = 88
 target-version = "py313"
 
 # Enable auto-fixes
-fixable = ["ALL"]
+lint.fixable = ["ALL"]
 
 [tool.pyright]
 include = ["src"]

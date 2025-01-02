@@ -81,7 +81,6 @@ class TranslateDict(TypedDict):
 
 
 def extract_translated_recipe(translation: str, recipe: EnrichedRecipe):
-
     if recipe.instructions is not None:
         ingredients_str, instructions = translation.split(INSTRUCTIONS_DELIMITER)
     else:

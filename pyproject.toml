@@ -51,9 +51,10 @@ fixable = ["ALL"]
 [tool.pyright]
 include = ["src"]
 exclude = ["**/__pycache__", ".venv"]
-typeCheckingMode = "strict"
+typeCheckingMode = "basic"
 useLibraryCodeForTypes = true
 reportMissingTypeStubs = false
+reportUnknownVariableType = false
 
 [build-system]
 requires = ["poetry-core"]

@@ -2,6 +2,7 @@
   "python.envFile": "${workspaceFolder}/.env",
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
   "python.analysis.autoImportCompletions": true,
+  "python.testing.pytestArgs": ["tests"],
   "[python]": {
     "diffEditor.ignoreTrimWhitespace": false,
     "gitlens.codeLens.symbolScopes": ["!Module"],
@@ -29,5 +30,6 @@
     "editor.formatOnSave": true,
     "editor.autoIndent": "keep",
     "editor.tabSize": 2
-  }
+  },
+  "makefile.configureOnOpen": true
 }

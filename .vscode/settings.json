@@ -2,7 +2,6 @@
   "python.envFile": "${workspaceFolder}/.env",
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
   "python.analysis.autoImportCompletions": true,
-  "python.testing.pytestArgs": ["${workspaceFolder}/tests/"],
   "[python]": {
     "diffEditor.ignoreTrimWhitespace": false,
     "gitlens.codeLens.symbolScopes": ["!Module"],

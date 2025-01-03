@@ -57,7 +57,6 @@ reportUnknownVariableType = false
 filterwarnings = ["ignore::DeprecationWarning:pydantic.*:"]
 
 [tool.coverage.run]
-testpaths = ["tests"]
 source = ["food_co2_estimator"]
 omit = ["tests/*", "**/__init__.py"]
 

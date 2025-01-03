@@ -18,20 +18,32 @@ def _create_enriched_recipe(
     )
 
 
-def test_english_instructions():
+@pytest.mark.parametrize(
+    "ingredients,instructions,expected",
+    [
+        (
+            ["eggplant", "cucumber"],
+            "Preheat the oven to 180 degrees. Add salt and pepper.",
+            Languages.English,
+        ),
+        (
+            ["aubergine", "agurk"],
+            "Forvarm ovnen til 180 grader. Tilsæt salt og peber.",
+            Languages.Danish,
+        ),
+        (
+            ["berenjena", "pepino"],
+            "Precalienta el horno a 180 grados. Añade sal y pimienta.",
+            None,
+        ),
+    ],
+)
+def test_language_from_instructions(ingredients, instructions, expected):
     recipe = _create_enriched_recipe(
-        ingredients=["eggplant", "cucumber"],
-        instructions="Preheat the oven to 180 degrees. Add salt and pepper.",
+        ingredients=ingredients,
+        instructions=instructions,
     )
-    assert detect_language(recipe) == Languages.English
-
-
-def test_danish_instructions():
-    recipe = _create_enriched_recipe(
-        ingredients=["aubergine", "agurk"],
-        instructions="Forvarm ovnen til 180 grader. Tilsæt salt og peber.",
-    )
-    assert detect_language(recipe) == Languages.Danish
+    assert detect_language(recipe) == expected
 
 
 @pytest.mark.parametrize(
@@ -59,12 +71,46 @@ def test_scandinavian_languages_as_danish(instructions, expected):
     "ingredients,expected",
     [
         (
-            ["500 gram torsk", "1 tsk fløde"],
+            [
+                "500 gram torskefilet",
+                "2 stk æg",
+                "1 stk gulerod, fintrevet",
+                "0.5 tsk revet muskatnød",
+                "2 spsk olie",
+                "4 dl creme fraiche (18%)",
+                "4 stk æggeblomme",
+                "2 spsk frisk dild, hakket",
+                "4 spsk frisk persille, hakket",
+            ],
             Languages.Danish,
         ),
         (
-            ["500 grams salmon", "1 tsp cream"],
+            [
+                "500 grams cod fillet",
+                "2 eggs",
+                "1 carrot, finely grated",
+                "0.5 tsp grated nutmeg",
+                "2 tbsp oil",
+                "4 dl sour cream (18%)",
+                "4 egg yolks",
+                "2 tbsp fresh dill, chopped",
+                "4 tbsp fresh parsley, chopped",
+            ],
             Languages.English,
+        ),
+        (
+            [
+                "500 gramos de filete de bacalao",
+                "2 huevos",
+                "1 zanahoria, finamente rallada",
+                "0.5 cucharadita de nuez moscada rallada",
+                "2 cucharadas de aceite",
+                "4 dl de crema agria (18%)",
+                "4 yemas de huevo",
+                "2 cucharadas de eneldo fresco, picado",
+                "4 cucharadas de perejil fresco, picado",
+            ],
+            None,
         ),
     ],
 )

@@ -8,32 +8,30 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "3.13.1"
 langchain = "^0.3.4"
-pandas = "^2.0.3"
 langdetect = "^1.0.9"
 flask = { extras = ["async"], version = "^2.3.2" }
 validators = "^0.21.2"
 bs4 = "^0.0.1"
 openai = "^1.52.0"
 gunicorn = "^21.2.0"
-openpyxl = "^3.1.2"
 langchain-community = "^0.3.3"
 langchain-openai = "^0.2.3"
-langchain-experimental = "^0.3.2"
 pydantic = "^2.9.2"
 langchain-chroma = "^0.1.4"
 translate = "^3.6.1"
 deep-translator = "^1.11.4"
-tqdm = "^4.67.0"
-poetry-plugin-export = "^1.8.0"
 markdownify = "^0.14.1"
-make = "^0.1.6.post2"
 
 
 [tool.poetry.group.dev.dependencies]
+make = "^0.1.6.post2"
 ipykernel = "^6.29.5"
 ruff = "^0.8.5"
 pyright = "^1.1.391"
 pytest = "^8.3.4"
+pandas = "^2.0.3"
+openpyxl = "^3.1.2"
+tqdm = "^4.67.0"
 
 [tool.ruff]
 # Exclude files and directories

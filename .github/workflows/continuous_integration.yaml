@@ -10,22 +10,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Install poetry v.1.8.5
         run: pipx install poetry==1.8.5
+
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: 3.13
           cache: "poetry"
+
       - name: Install dependencies
         run: |
           make install
+
       - name: Check linting
         run: |
           make lint
+
       - name: Format code
         run: |
           make format
+
       - name: Run type checking
         run: |
           make type-check

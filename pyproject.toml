@@ -33,6 +33,7 @@ pytest = "^8.3.4"
 pandas = "^2.0.3"
 openpyxl = "^3.1.2"
 tqdm = "^4.67.0"
+pytest-cov = "^6.0.0"
 
 
 [build-system]
@@ -51,3 +52,20 @@ typeCheckingMode = "basic"
 useLibraryCodeForTypes = true
 reportMissingTypeStubs = false
 reportUnknownVariableType = false
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning:pydantic.*:"]
+
+[tool.coverage.run]
+testpaths = ["tests"]
+source = ["food_co2_estimator"]
+omit = ["tests/*", "**/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

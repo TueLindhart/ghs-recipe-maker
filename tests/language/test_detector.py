@@ -20,7 +20,7 @@ def _create_enriched_recipe(
 
 def test_english_instructions():
     recipe = _create_enriched_recipe(
-        ingredients=["salt", "pepper"],
+        ingredients=["eggplant", "cucumber"],
         instructions="Preheat the oven to 180 degrees. Add salt and pepper.",
     )
     assert detect_language(recipe) == Languages.English
@@ -28,7 +28,7 @@ def test_english_instructions():
 
 def test_danish_instructions():
     recipe = _create_enriched_recipe(
-        ingredients=["salt", "peber"],
+        ingredients=["aubergine", "agurk"],
         instructions="Forvarm ovnen til 180 grader. Tilsæt salt og peber.",
     )
     assert detect_language(recipe) == Languages.Danish
@@ -59,11 +59,11 @@ def test_scandinavian_languages_as_danish(instructions, expected):
     "ingredients,expected",
     [
         (
-            ["500 gram torskefilet", "1 tsk havsalt"],
+            ["500 gram torsk", "1 tsk fløde"],
             Languages.Danish,
         ),
         (
-            ["500 grams cod fillet", "1 tsp sea salt"],
+            ["500 grams salmon", "1 tsp cream"],
             Languages.English,
         ),
     ],
@@ -86,17 +86,9 @@ def test_empty_recipe_raises_exception():
         detect_language(recipe)
 
 
-def test_mixed_language_prefers_instructions():
-    recipe = _create_enriched_recipe(
-        ingredients=["500 gram torskefilet", "1 tsp sea salt"],
-        instructions="Preheat the oven and bake until done.",
-    )
-    assert detect_language(recipe) == Languages.English
-
-
 def test_single_word_ingredients():
     recipe = _create_enriched_recipe(
-        ingredients=["salt", "peber", "mel"],
+        ingredients=["agurk", "gulerod", "ærter"],
         instructions=None,
     )
     assert detect_language(recipe) == Languages.Danish

@@ -1,6 +1,5 @@
 from typing import Optional
 
-from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 
 
@@ -21,6 +20,3 @@ class CO2SearchResult(BaseModel):
 
 class CO2SearchResults(BaseModel):
     search_results: list[CO2SearchResult]
-
-
-search_co2_output_parser = PydanticOutputParser(pydantic_object=CO2SearchResult)

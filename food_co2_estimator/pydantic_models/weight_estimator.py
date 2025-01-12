@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 
 
@@ -18,6 +17,3 @@ class WeightEstimates(BaseModel):
     weight_estimates: List[WeightEstimate] = Field(
         description="List of 'WeightEstimate' per ingredient."
     )
-
-
-weight_output_parser = PydanticOutputParser(pydantic_object=WeightEstimates)

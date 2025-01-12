@@ -79,10 +79,14 @@ class EnrichedRecipe(ExtractedRecipe):
             instructions=extracted_recipe.instructions,
         )
 
-    def get_match_object(self, obj: WeightEstimate | CO2perKg | CO2SearchResult):
+    def get_match_objects(
+        self, obj: WeightEstimate | CO2perKg | CO2SearchResult
+    ) -> list[EnrichedIngredient]:
+        matched_ingredients = []
         for ingredient in self.ingredients:
             if ingredient.en_name == obj.ingredient:
-                return ingredient
+                matched_ingredients.append(ingredient)
+        return matched_ingredients
 
     def update_with_translations(
         self, translated_ingredients: list[str], instructions: str | None
@@ -99,18 +103,18 @@ class EnrichedRecipe(ExtractedRecipe):
 
     def update_with_weight_estimates(self, weight_estimates: WeightEstimates):
         for weight_estimate in weight_estimates.weight_estimates:
-            ingredient = self.get_match_object(weight_estimate)
-            if ingredient is not None:
+            ingredients = self.get_match_objects(weight_estimate)
+            for ingredient in ingredients:
                 ingredient.set_weight_estimate(weight_estimate)
 
     def update_with_co2_per_kg_db(self, co2_emissions: CO2Emissions):
         for co2_per_kg in co2_emissions.emissions:
-            ingredient = self.get_match_object(co2_per_kg)
-            if ingredient is not None:
+            ingredients = self.get_match_objects(co2_per_kg)
+            for ingredient in ingredients:
                 ingredient.set_co2_per_kg_db(co2_per_kg)
 
     def update_with_co2_per_kg_search(self, co2_emissions: CO2SearchResults):
         for co2_per_kg in co2_emissions.search_results:
-            ingredient = self.get_match_object(co2_per_kg)
-            if ingredient is not None:
+            ingredients = self.get_match_objects(co2_per_kg)
+            for ingredient in ingredients:
                 ingredient.set_co2_per_kg_search(co2_per_kg)

@@ -265,7 +265,8 @@ if __name__ == "__main__":
     # url = "https://www.allrecipes.com/recipe/267703/dutch-oven-southwestern-chicken-pot-pie/"
     # url = "https://gourministeriet.dk/vores-favorit-bolognese/"
     # url = "https://hot-thai-kitchen.com/green-curry-new-2/"
-    url = "https://www.arla.dk/opskrifter/nytarstorsk-bagt-torsk-med-sennepssauce/"
+    # url = "https://www.arla.dk/opskrifter/nytarstorsk-bagt-torsk-med-sennepssauce/"
+    url = "https://www.valdemarsro.dk/vegetar-enchiladas/"
 
     start_time = time()
     print(

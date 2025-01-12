@@ -106,8 +106,6 @@ The following environment variables must be set in the .env file:
 
 Set the following environment variables in your `.env` file:
 
-test
-
 ```bash
 OPENAI_API_KEY=<your_key>
 SERPER_API_KEY=<your_key>

@@ -254,7 +254,6 @@ async def async_estimator(
 if __name__ == "__main__":
     from time import time
 
-    start_time = time()
     # url = "https://www.foodfanatic.dk/tacos-med-lynchili-og-salsa"
     # url = "https://madogkaerlighed.dk/cremet-pasta-med-asparges/"
     # url = "https://www.valdemarsro.dk/spaghetti-bolognese/"
@@ -272,6 +271,5 @@ if __name__ == "__main__":
     print(
         asyncio.run(async_estimator(url=url, verbose=True, logging_level=logging.INFO))
     )
-    # estimator(url=url, verbose=True)
     end_time = time()
     print(f"Async time elapsed: {end_time - start_time}s")

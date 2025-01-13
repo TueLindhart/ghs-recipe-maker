@@ -212,10 +212,11 @@ def get_emission_retriever_chain(k: int = 5, **kwargs):
     return retriever | parse_retriever_output
 
 
-def batch_emission_retriever(inputs: List[str]):
+async def batch_emission_retriever(inputs: List[str]):
     retriever_chain = get_emission_retriever_chain()
     cleaned_inputs = clean_ingredient_list(inputs)
-    return dict(zip(inputs, retriever_chain.batch(cleaned_inputs)))
+    outputs = await retriever_chain.abatch(cleaned_inputs)
+    return dict(zip(inputs, outputs))
 
 
 def remove_quantities(ingredient: str) -> str:

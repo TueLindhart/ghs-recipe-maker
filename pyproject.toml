@@ -21,6 +21,7 @@ langchain-chroma = "^0.1.4"
 translate = "^3.6.1"
 deep-translator = "^1.11.4"
 markdownify = "^0.14.1"
+pytest = "^8.3.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -32,18 +33,18 @@ pytest = "^8.3.4"
 pandas = "^2.0.3"
 openpyxl = "^3.1.2"
 tqdm = "^4.67.0"
+pytest-cov = "^4.0.0"
+pytest-mock = "^3.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-# Exclude files and directories
 exclude = [".git", ".venv", "__pycache__", "*.ipynb"]
-
-# Line length
 line-length = 88
-
-# Python target version
 target-version = "py313"
-
-# Enable auto-fixes
 lint.fixable = ["ALL"]
 
 [tool.pyright]
@@ -53,6 +54,5 @@ useLibraryCodeForTypes = true
 reportMissingTypeStubs = false
 reportUnknownVariableType = false
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning:pydantic.*:"]

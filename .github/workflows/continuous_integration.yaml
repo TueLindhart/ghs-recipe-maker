@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  ci-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -37,3 +37,7 @@ jobs:
       - name: Run type checking
         run: |
           make type-check
+
+      - name: Run tests
+        run: |
+          make test

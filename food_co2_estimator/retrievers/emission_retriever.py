@@ -20,73 +20,74 @@ NUMBER_WORDS = [
     "ten",
     "eleven",
     "twelve",
+    "half",
+    "quarter",
 ]
 
 # List of units, sorted by length in decreasing order to match longer units first
 INGREDIENT_UNITS = sorted(
     [
         # Weight Units
-        "kilograms",
-        "milligrams",
-        "kilogram",
         "milligram",
-        "pounds",
-        "ounces",
-        "grams",
-        "pound",
-        "ounce",
+        "milligrams",
         "gram",
-        "kg",
+        "grams",
+        "kilogram",
+        "kilograms",
+        "ounce",
+        "ounces",
+        "pound",
+        "pounds",
         "mg",
         "g",
+        "kg",
         "oz",
         "lb",
         "lbs",
         # Volume Units
-        "milliliters",
-        "deciliters",
-        "tablespoons",
-        "teaspoons",
         "milliliter",
+        "milliliters",
         "deciliter",
-        "tablespoon",
-        "teaspoon",
-        "pints",
-        "quarts",
-        "gallons",
+        "deciliters",
+        "liter",
         "liters",
         "litre",
-        "liter",
-        "cups",
-        "pint",
-        "quart",
-        "gallon",
+        "litres",
         "cup",
+        "cups",
+        "tablespoon",
+        "tablespoons",
+        "teaspoon",
+        "teaspoons",
+        "pint",
+        "pints",
+        "quart",
+        "quarts",
+        "gallon",
+        "gallons",
         "ml",
         "l",
         "dl",
-        "tbsps",
         "tbsp",
+        "tbsps",
         "tsp",
-        "ltr",
-        "ltrs",
         # Miscellaneous Units
-        "packages",
-        "bunches",
-        "pinches",
-        "cloves",
-        "slices",
-        "bottles",
-        "pieces",
-        "sticks",
-        "bunch",
-        "pinch",
-        "clove",
-        "slice",
-        "bottle",
-        "piece",
-        "stick",
         "package",
+        "packages",
+        "bunch",
+        "bunches",
+        "pinch",
+        "pinches",
+        "clove",
+        "cloves",
+        "slice",
+        "slices",
+        "bottle",
+        "bottles",
+        "piece",
+        "pieces",
+        "stick",
+        "sticks",
         "pkg",
         "pkgs",
         "dozen",
@@ -96,7 +97,6 @@ INGREDIENT_UNITS = sorted(
         "drop",
         "drops",
         "large",
-        ""
         # Short Units
         "t",
         "c",
@@ -104,6 +104,52 @@ INGREDIENT_UNITS = sorted(
     key=len,
     reverse=True,
 )  # Sort units by length in decreasing order
+
+FILLER_WORDS = [
+    "a",
+    "about",
+    "additional",
+    "all",
+    "an",
+    "and",
+    "any",
+    "approximately",
+    "around",
+    "at",
+    "each",
+    "enough",
+    "extra",
+    "few",
+    "for",
+    "fresh",
+    "full",
+    "handful",
+    "just",
+    "large",
+    "little",
+    "medium",
+    "more",
+    "nearly",
+    "of",
+    "or",
+    "other",
+    "per",
+    "piece",
+    "pinch",
+    "plus",
+    "portion",
+    "roughly",
+    "serving",
+    "several",
+    "small",
+    "some",
+    "tablespoon",
+    "teaspoon",
+    "the",
+    "to",
+    "whole",
+    "with",
+]
 
 
 def get_clean_regex():
@@ -134,7 +180,9 @@ def get_clean_regex():
                 (?:{units})?                      # Optional units
                 \s*                               # Optional whitespace
             )
-        )+                                        # One or more quantities with optional units
+            |                                     # OR
+            (?:{units})                           # Units without preceding quantities
+        )+                                        # One or more quantities or units
         (?:of\b\s*)?                              # Optional 'of' followed by optional whitespace
     """.format(units=units_pattern)
 
@@ -164,34 +212,50 @@ def get_emission_retriever_chain(k: int = 5, **kwargs):
     return retriever | parse_retriever_output
 
 
-def batch_emission_retriever(inputs: List[str]):
+async def batch_emission_retriever(inputs: List[str]):
     retriever_chain = get_emission_retriever_chain()
     cleaned_inputs = clean_ingredient_list(inputs)
-    return dict(zip(inputs, retriever_chain.batch(cleaned_inputs)))
+    outputs = await retriever_chain.abatch(cleaned_inputs)
+    return dict(zip(inputs, outputs))
 
 
 def remove_quantities(ingredient: str) -> str:
-    """
-    Removes quantities (numbers, fractions, decimals, number words) from the beginning of an ingredient string.
+    """Removes quantities recursively from ingredient string."""
 
-    Args:
-        ingredient (str): The ingredient string to process.
+    # Basic number patterns
+    decimal_pattern = r"\d*(\.|\,)\d+"  # 0.5, .75
+    fraction_pattern = r"\d+(?:\/\d+)?"  # 1/2, 3/4
 
-    Returns:
-        str: The ingredient string without leading quantities.
-    """
-    # Create a regex pattern to match quantities
+    # Word patterns including single words and connecting symbols
+    number_words_pattern = r"\b(?:" + "|".join(NUMBER_WORDS) + r")\b"
+    connecting_symbols = (
+        r"(?:to\s+|~|\.\.{2,3}|\-)"  # Require at least one whitespace around 'to'
+    )
+
+    filler_words = r"\b(?:" + "|".join(FILLER_WORDS) + r")\b(?:\s+|\-)"
+
+    # Combined pattern
     quantity_pattern = re.compile(
-        r"^\s*"  # Start of string and optional whitespace
-        r"(?:"  # Non-capturing group for quantities
-        r"\d+(?:[\/\-]\d+)?"  # Whole number with optional fraction or range (e.g., 1, 1/2, 3-4)
-        r"|\d*\.\d+"  # Decimal number (e.g., 0.5, .75)
-        r"|\b(?:" + "|".join(NUMBER_WORDS) + r")\b"  # Number words (e.g., one, two)
-        r")\s*",  # Optional whitespace after quantity
+        r"^\s*"  # Start of string and whitespace
+        r"(?:"  # Start non-capturing group
+        f"(?:{decimal_pattern})"  # Match decimals
+        r"|"
+        f"(?:{fraction_pattern})"  # Match fractions
+        r"|"
+        f"(?:{number_words_pattern})"  # Match number words
+        r"|"
+        f"(?:{connecting_symbols})"  # Require at least one connecting symbol
+        r"|"
+        f"(?:{filler_words})"  # Match filler words
+        r")",
         re.IGNORECASE,
     )
-    # Remove the quantity from the ingredient string
-    return quantity_pattern.sub("", ingredient, count=1).strip()
+
+    # Recursive removal until no match
+    if quantity_pattern.match(ingredient):
+        removed_quantity = quantity_pattern.sub("", ingredient, count=1).strip()
+        return remove_quantities(removed_quantity)
+    return ingredient
 
 
 def remove_units(ingredient: str) -> str:
@@ -219,7 +283,10 @@ def remove_units(ingredient: str) -> str:
         re.IGNORECASE,
     )
     # Remove the units from the ingredient string
-    return units_pattern.sub("", ingredient, count=1).strip()
+    removed_units = units_pattern.sub("", ingredient, count=1).strip()
+    if removed_units == "":
+        return ingredient
+    return removed_units
 
 
 def clean_ingredient_list(ingredients: List[str]) -> List[str]:

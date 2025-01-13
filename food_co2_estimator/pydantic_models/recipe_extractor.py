@@ -34,6 +34,10 @@ class EnrichedIngredient(BaseModel):
     co2_per_kg_db: CO2perKg | None = None
     co2_per_kg_search: CO2SearchResult | None = None
 
+    @classmethod
+    def from_list(cls, ingredients: list[str]) -> List["EnrichedIngredient"]:
+        return [cls(original_name=ingredient) for ingredient in ingredients]
+
     def is_name_match(self, name: str) -> bool:
         return self.en_name == name
 
@@ -71,10 +75,7 @@ class EnrichedRecipe(ExtractedRecipe):
     ) -> "EnrichedRecipe":
         return cls(
             url=url,
-            ingredients=[
-                EnrichedIngredient(original_name=ingredient)
-                for ingredient in extracted_recipe.ingredients
-            ],
+            ingredients=EnrichedIngredient.from_list(extracted_recipe.ingredients),
             persons=extracted_recipe.persons,
             instructions=extracted_recipe.instructions,
         )
